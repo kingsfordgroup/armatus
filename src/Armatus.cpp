@@ -1,7 +1,21 @@
 #include <boost/program_options.hpp>
 #include "Version.hpp"
+#include <iostream>
+
+using namespace std;
 
 int main(int argc, char* argv[]) {
+
+  auto str = R"(
+***********************************
+***********************************
+****                           ****
+****        ARMATUS 1.0        ****
+****                           ****
+***********************************
+***********************************
+)";
+
   namespace po = boost::program_options;
   using std::string;
   using std::cerr;
@@ -19,6 +33,7 @@ int main(int argc, char* argv[]) {
     po::notify(vm);    
 
     if (vm.count("help")) {
+      cerr << str << "\n";
       cerr << opts << "\n";
       return 1;
     }
@@ -34,5 +49,7 @@ int main(int argc, char* argv[]) {
     cerr << "exception : [" << e.what() << "]. Exiting.\n";
     std::exit(1);
   }
+
+
   return 0;
 }
