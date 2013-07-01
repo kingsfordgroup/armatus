@@ -8,6 +8,6 @@ set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(CMAKE_VERBOSE_MAKEFILE true)
 
-find_package(Boost COMPONENTS program_options iostreams graph)
+find_package(Boost COMPONENTS program_options iostreams graph system)
 
 add_subdirectory(src)
