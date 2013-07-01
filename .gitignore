@@ -2,12 +2,28 @@
 *.slo
 *.lo
 *.o
-
 # Compiled Dynamic libraries
 *.so
 *.dylib
-
 # Compiled Static libraries
 *.lai
 *.la
 *.a
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# OSX
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+# Thumbnails
+._*
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
