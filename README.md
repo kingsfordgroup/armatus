@@ -33,18 +33,25 @@ CMake:
 Components
 ----------
 
-Core:
+* armatus executable: (Boost Program Options): Armatus.cpp
 
-* armatus executable: (Boost Program Options)
-* Parse3CMatrix(File): 3C matrix parser (Dixon et al. format)
-* BuildDAG(Matrix): Build the DAG for the dynamic program (Boost Graph)
-* Viterbi(DAG): Run the Viterbi algorithm on DAG to solve the dynamic program
-* MultipleSolutions(DAG): Contains algorithms for multiple solutions
+ArmatusIO.{cpp,hpp}:
 
-Data structures:
+* parseMatrix(File): 3C matrix parser (Dixon et al. format)
+* outputDomains(DAG)
 
-* SolutionDAG
-* 
+Data structures {cpp,hpp}:
+
+* ArmatusParams(Matrix, gamma): parameters to DP and pre-computable quantities such as the quality function
+* ArmatusDAG(Params): encodes structure of dynamic program
+    * build(): Build the DAG for the dynamic program (Boost Graph)
+    * computeTopK(k): At every node, store k 3-tuples: (edge, child solution, score of kth best solution for this subproblem)
+    * extractTopK(k): Returns a set of domains
+* Domain
+    * score(Params)
+    
+* Matrix: use the ublas matrix itself
+
 
 Testing:
 
