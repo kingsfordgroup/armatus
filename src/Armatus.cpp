@@ -3,6 +3,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
+#include "ArmatusParams.hpp"
 #include "Version.hpp"
 #include "MatrixParser.hpp"
 
@@ -50,6 +51,7 @@ int main(int argc, char* argv[]) {
       MatrixParser parser;
   	  auto mat = parser.parseGZipMatrix(vm["input"].as<string>());
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
+      ArmatusParams params(mat, vm["gamma"].as<double>());
     } else {
       cerr << "Input file was not set.\n";
       std::exit(1);

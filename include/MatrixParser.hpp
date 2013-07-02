@@ -8,9 +8,9 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 
 class MatrixParser {
-  using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
   //using SparseSymmetricMatrix = ublas::sparse_adaptor<SparseMatrix, ublas::upper>;
 	public: 
+    using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
 		std::shared_ptr<SparseMatrix> parseGZipMatrix(std::string path);
 };
 
