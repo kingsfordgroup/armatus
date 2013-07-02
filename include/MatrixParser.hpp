@@ -1,3 +1,6 @@
 #include <string>
 
-void MatrixParser::parseGZipMatrix(std::string path);
+class MatrixParser {
+	public: 
+		void parseGZipMatrix(std::string path);
+};
