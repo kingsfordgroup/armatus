@@ -4,20 +4,20 @@
 #include <boost/program_options.hpp>
 
 #include "Version.hpp"
+#include "MatrixParser.hpp"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-
   auto str = R"(
-***********************************
-***********************************
-****                           ****
-****        ARMATUS 1.0        ****
-****                           ****
-***********************************
-***********************************
-)";
+	***********************************
+	***********************************
+	****                           ****
+	****        ARMATUS 1.0        ****
+	****                           ****
+	***********************************
+	***********************************
+	)";
 
   namespace po = boost::program_options;
   using std::string;
@@ -45,6 +45,11 @@ int main(int argc, char* argv[]) {
 
     if (vm.count("input")) {
       cerr << "Reading input from " << vm["input"].as<string>() << ".\n";
+      // parse input matrix file
+
+      MatrixParser parser;
+  	  auto mat = parser.parseGZipMatrix(vm["input"].as<string>());
+      cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
     } else {
       cerr << "Input file was not set.\n";
       std::exit(1);
@@ -55,6 +60,7 @@ int main(int argc, char* argv[]) {
     std::exit(1);
   }
 
+  
 
   return 0;
 }
