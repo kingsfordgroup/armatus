@@ -23,7 +23,7 @@ void ArmatusParams::computeSumMuSigma_() {
 	std::vector<accumulator_set<double,stats<tag::mean, tag::count>>> acc(n);
 
 	// A reference will be easier to work with here
-	MatrixParser::SparseMatrix& M = *A;
+	SparseMatrix& M = *A;
 
 
 	for (size_t i : boost::irange(size_t{0}, n)) {

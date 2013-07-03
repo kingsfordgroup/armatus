@@ -10,9 +10,9 @@
 class ArmatusParams {
   using SymmetricMatrix = boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>;
   public:
-    explicit ArmatusParams(std::shared_ptr<MatrixParser::SparseMatrix> _A, double _gamma);
+    explicit ArmatusParams(std::shared_ptr<SparseMatrix> _A, double _gamma);
     void computeSumMuSigma_();
-    std::shared_ptr<MatrixParser::SparseMatrix> A;
+    std::shared_ptr<SparseMatrix> A;
     SymmetricMatrix sums;
     size_t n;
     double gamma;
