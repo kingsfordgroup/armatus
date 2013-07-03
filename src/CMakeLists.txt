@@ -1,4 +1,4 @@
-set (ARMATUS_MAIN Armatus.cpp MatrixParser.cpp)
+set (ARMATUS_MAIN Armatus.cpp MatrixParser.cpp ArmatusParams.cpp)
 
 include_directories( 
 ${Boost_INCLUDE_DIR}
