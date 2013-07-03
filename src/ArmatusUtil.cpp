@@ -21,11 +21,11 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string.hpp>
-#include "MatrixParser.hpp"
+#include "ArmatusUtil.hpp"
 
 using namespace std;
 
-shared_ptr<MatrixParser::SparseMatrix> MatrixParser::parseGZipMatrix(string path) {
+shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
 	cout << "parsing gzip " << path << endl;
 
     auto m = make_shared<SparseMatrix>();

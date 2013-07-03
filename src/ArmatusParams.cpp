@@ -8,7 +8,7 @@
 
 #include "ArmatusParams.hpp"
 
-ArmatusParams::ArmatusParams(std::shared_ptr<MatrixParser::SparseMatrix> Ap, double gammap) :
+ArmatusParams::ArmatusParams(std::shared_ptr<SparseMatrix> Ap, double gammap) :
  A(Ap), n(Ap->size1()), gamma(gammap), mu(std::vector<double>(Ap->size1())),
  sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())) {
  computeSumMuSigma_();

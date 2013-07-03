@@ -35,10 +35,10 @@ Components
 
 * armatus executable: (Boost Program Options): Armatus.cpp
 
-ArmatusIO.{cpp,hpp}:
+ArmatusUtil.{cpp,hpp}:
 
 * parseMatrix(File): 3C matrix parser (Dixon et al. format)
-* outputDomains(DAG)
+* outputDomains()
 
 Data structures {cpp,hpp}:
 
@@ -47,9 +47,7 @@ Data structures {cpp,hpp}:
     * build(): Build the DAG for the dynamic program (Boost Graph)
     * computeTopK(k): At every node, store k 3-tuples: (edge, child solution, score of kth best solution for this subproblem)
     * extractTopK(k): Returns a set of domains
-* Domain
-    * score(Params)
-    
+
 * Matrix: use the ublas matrix itself
 
 

@@ -5,7 +5,7 @@
 
 #include <boost/numeric/ublas/symmetric.hpp>
 
-#include "MatrixParser.hpp"
+#include "ArmatusUtil.hpp"
 
 class ArmatusParams {
   using SymmetricMatrix = boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>;
