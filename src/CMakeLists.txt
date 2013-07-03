@@ -1,4 +1,4 @@
-set (ARMATUS_MAIN Armatus.cpp ArmatusUtil.cpp ArmatusParams.cpp)
+set (ARMATUS_MAIN Armatus.cpp ArmatusUtil.cpp ArmatusParams.cpp ArmatusDAG.cpp)
 
 include_directories( 
 ${Boost_INCLUDE_DIR}
