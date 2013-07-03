@@ -24,10 +24,12 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/io.hpp>
 #include "MatrixParser.hpp"
+#include "ArmatusUtil.hpp"
+
 
 using namespace std;
 
-shared_ptr<MatrixParser::SparseMatrix> MatrixParser::parseGZipMatrix(string path) {
+shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
 	cout << "parsing gzip " << path << endl;
 
     auto m = make_shared<SparseMatrix>();
