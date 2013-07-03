@@ -12,7 +12,6 @@ ArmatusParams::ArmatusParams(std::shared_ptr<SparseMatrix> Ap, double gammap) :
  A(Ap), n(Ap->size1()), gamma(gammap), mu(std::vector<double>(Ap->size1())),
  sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())) {
  computeSumMuSigma_();
- //computeQmax();
 }
 
 void ArmatusParams::computeSumMuSigma_() {
@@ -24,14 +23,13 @@ void ArmatusParams::computeSumMuSigma_() {
 
 	// A reference will be easier to work with here
 	SparseMatrix& M = *A;
-
+	std::cerr << "M is " << M.size1() << " x " << M.size2() << "\n";
 
 	for (size_t i : boost::irange(size_t{0}, n)) {
 		sums(i, i) = M(i, i);
 	}
 
-	for (size_t i : boost::irange(size_t{0}, n)) {
-		std::cerr << "column " << i << "\n";
+	for (size_t i : boost::irange(size_t{1}, n)) {
 		std::vector<double> columnSums(i+1);
 		columnSums[i] = M(i, i);
 		for (size_t j : boost::adaptors::reverse(boost::irange(size_t{0}, i-1))) {
