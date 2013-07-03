@@ -18,6 +18,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/io.hpp>
 
 using namespace std;
 
@@ -30,12 +32,16 @@ void MatrixParser::parseGZipMatrix(string path) {
     in.push(file);
     // boost::iostreams::copy(in, cout);
 
+    // TODO: size?
+	boost::numeric::ublas::mapped_matrix<double> m (3, 3, 3 * 3);
+
     string line;
     std::istream incoming(&in);
     int i = 0;
     while ( incoming ) {
-    	if (i > 10) break;
     	getline(incoming, line);
+    	if (i == 0) {
+    	}
     	cout << line << endl;
     	vector<string> parts;
 		// parts.reserve(3);
