@@ -5,7 +5,7 @@
 
 #include "ArmatusParams.hpp"
 #include "Version.hpp"
-#include "MatrixParser.hpp"
+#include "ArmatusUtil.hpp"
 
 using namespace std;
 
@@ -48,8 +48,7 @@ int main(int argc, char* argv[]) {
       cerr << "Reading input from " << vm["input"].as<string>() << ".\n";
       // parse input matrix file
 
-      MatrixParser parser;
-  	  auto mat = parser.parseGZipMatrix(vm["input"].as<string>());
+  	  auto mat = parseGZipMatrix(vm["input"].as<string>());
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
       ArmatusParams params(mat, vm["gamma"].as<double>());
     } else {

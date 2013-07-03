@@ -5,14 +5,14 @@
 
 #include <boost/numeric/ublas/symmetric.hpp>
 
-#include "MatrixParser.hpp"
+#include "ArmatusUtil.hpp"
 
 class ArmatusParams {
   using SymmetricMatrix = boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>;
   public:
-    explicit ArmatusParams(std::shared_ptr<MatrixParser::SparseMatrix> _A, double _gamma);
+    explicit ArmatusParams(std::shared_ptr<SparseMatrix> _A, double _gamma);
 
-    std::shared_ptr<MatrixParser::SparseMatrix> A;
+    std::shared_ptr<SparseMatrix> A;
     SymmetricMatrix sums;
     std::vector<double> mu;
     std::vector<double> sigma;
