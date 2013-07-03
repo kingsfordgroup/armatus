@@ -14,6 +14,7 @@ Note: Although this should be conceptually easy, properly installing these depen
 Compilation:
 
     $ mkdir build
+    $ cd build
     $ cmake [options] ..
 
 Here is an example of how to compile boost with Clang++ and use Clang++ to compile Armatus on OS X:
