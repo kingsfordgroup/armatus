@@ -21,7 +21,11 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include "MatrixParser.hpp"
 #include "ArmatusUtil.hpp"
+
 
 using namespace std;
 
@@ -34,7 +38,7 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
     boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
     in.push(boost::iostreams::gzip_decompressor());
     in.push(file);
-    // boost::iostreams::copy(in, cout);
+	boost::numeric::ublas::mapped_matrix<double> m (3, 3, 3 * 3);
 
     string line;
     std::istream incoming(&in);
