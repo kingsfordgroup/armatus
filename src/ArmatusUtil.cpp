@@ -65,3 +65,9 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
 	// SparseSymmetricMatrix symMat(m);
  //    std::cerr << "M is " << symMat.size1() << " x " << symMat.size2() << ", with " << m.nnz() << " non-zero entries\n";
 }
+
+class Domain {
+public:
+    size_t start;
+    size_t end;
+};
