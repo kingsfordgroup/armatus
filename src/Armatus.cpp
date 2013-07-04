@@ -4,6 +4,7 @@
 #include <boost/program_options.hpp>
 
 #include "ArmatusParams.hpp"
+#include "ArmatusDAG.hpp"
 #include "Version.hpp"
 #include "ArmatusUtil.hpp"
 
@@ -51,6 +52,14 @@ int main(int argc, char* argv[]) {
   	  auto mat = parseGZipMatrix(vm["input"].as<string>());
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
       ArmatusParams params(mat, vm["gamma"].as<double>());
+      ArmatusDAG G(params);
+      G.build();
+      G.topK(50);
+      // auto domains = G.viterbiPath();
+      // std::cerr << "Solution contained " << domains.size() << " domains\n";
+      // double totalScore = 0.0;
+      // for (auto& d : domains) { totalScore += d.score(params); }
+      // std::cerr << "Total solution score: " << totalScore << "\n";
     } else {
       cerr << "Input file was not set.\n";
       std::exit(1);

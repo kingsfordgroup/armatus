@@ -23,9 +23,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/io.hpp>
-#include "MatrixParser.hpp"
 #include "ArmatusUtil.hpp"
-
+#include "ArmatusParams.hpp"
 
 using namespace std;
 
@@ -38,14 +37,16 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
     boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
     in.push(boost::iostreams::gzip_decompressor());
     in.push(file);
-	boost::numeric::ublas::mapped_matrix<double> m (3, 3, 3 * 3);
 
     string line;
     std::istream incoming(&in);
     bool firstLine = true;
     size_t i = 0;
+    double tot = 0.0;
+    size_t nedge = 0;
     while ( getline(incoming, line) ) {
     	vector<string> parts;
+        boost::trim(line);
 		boost::split(parts, line, boost::is_any_of("\t"));
         
         if (firstLine) { 
@@ -54,24 +55,25 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
         }
         
         for (size_t j : boost::irange(3 + i, parts.size())) {
-            float e  = stof(parts[j]);
+            double e  = stod(parts[j]);
             if (e > 0.0) {
                 size_t row = j - 3;
                 m->push_back(i, row, e);
-            }
+                tot += e;
+                nedge++;
+            }   
         }
 
     	++i;
         if ( i % 1000 == 0 ) { std::cerr << "line " << i << "\n"; }
     }
-
+    std::cerr << "Avg edge " << tot / nedge << " sum " << tot  << " cnt " << nedge << "\n";
     return m;
 	// SparseSymmetricMatrix symMat(m);
  //    std::cerr << "M is " << symMat.size1() << " x " << symMat.size2() << ", with " << m.nnz() << " non-zero entries\n";
 }
 
-class Domain {
-public:
-    size_t start;
-    size_t end;
-};
+double Domain::score(ArmatusParams& p) {
+    size_t d = end-start;
+    return std::max((p.sums(start, end)/ std::pow(static_cast<double>(d),p.gamma)) - p.mu[d], 0.0);
+}

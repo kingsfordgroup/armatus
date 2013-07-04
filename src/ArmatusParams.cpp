@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <limits>
 
 #include <boost/range/adaptors.hpp>
@@ -19,7 +20,7 @@ void ArmatusParams::computeSumMuSigma_() {
 	using namespace boost::range;
 	// Vector to hold accumulators that will compute the mean
 	// for domains of each size.
-	std::vector<accumulator_set<double,stats<tag::mean, tag::count>>> acc(n);
+	std::vector<accumulator_set<double,stats<tag::immediate_mean, tag::count>>> acc(n);
 
 	// A reference will be easier to work with here
 	SparseMatrix& M = *A;
@@ -32,13 +33,13 @@ void ArmatusParams::computeSumMuSigma_() {
 	for (size_t i : boost::irange(size_t{1}, n)) {
 		std::vector<double> columnSums(i+1);
 		columnSums[i] = M(i, i);
-		for (size_t j : boost::adaptors::reverse(boost::irange(size_t{0}, i-1))) {
+		for (size_t j : boost::adaptors::reverse(boost::irange(size_t{0}, i))) {
 			columnSums[j] = columnSums[j+1] + M(j, i);
 			sums(j, i) = sums(j, i-1) + columnSums[j];
 			//sums(i, j) = sums(j, i);
 
 			int d = i - j;
-			double s = sums(j, i) / std::pow(d, gamma);
+			double s = sums(j, i) / std::pow(static_cast<double>(d), gamma);
 			acc[d](s);
 		}
 	}

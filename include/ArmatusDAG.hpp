@@ -1,7 +1,7 @@
 #ifndef __ARMATUS_DAG_HPP__
 #define __ARMATUS_DAG_HPP__
 
-
+#include "ArmatusUtil.hpp"
 #include "ArmatusParams.hpp"
 
 using namespace boost;
@@ -13,9 +13,16 @@ class ArmatusDAG {
 
     class BackPointer {
         public:
-        EdgeID edge;
+        size_t edge;
         size_t childSolution;
         double score;
+        bool operator==(const BackPointer &other) const { 
+            return (edge == other.edge) and (childSolution == other.childSolution) and
+                   (score == other.score);
+        }
+        bool operator!=(const BackPointer &other) const { 
+            return !((*this) == other);
+        }
     };
 
     class SubProblem {
@@ -31,17 +38,17 @@ class ArmatusDAG {
 
     public:
     
-    ArmatusDAG(ArmatusParams &p) : 
-        solutionDAG(SubProbsVec(p.n+1)), 
-        edgeWeights(EdgeWeightsVec(p.n+1, vector<double>())) {
-        params = &p;
-    }
+    explicit ArmatusDAG(ArmatusParams &p);
     
-    void build() {
-        for (size_t i = 1; i <= params->n; i++) {
-            edgeWeights[i]
-        }
-    }
+    void build();
+
+    double q(size_t k, size_t l);
+    
+    double s(size_t k, size_t l);
+
+    vector<Domain> viterbiPath();
+
+    void topK(uint32_t k);
 };
 
 #endif // __ARMATUS_DAG_HPP__
