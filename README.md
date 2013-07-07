@@ -39,18 +39,23 @@ Components
 ArmatusUtil.{cpp,hpp}:
 
 * parseMatrix(File): 3C matrix parser (Dixon et al. format)
-* outputDomains()
+* outputDomains(set of domains)
+* consensus(set of domains)
 
 Data structures {cpp,hpp}:
 
 * ArmatusParams(Matrix, gamma): parameters to DP and pre-computable quantities such as the quality function
 * ArmatusDAG(Params): encodes structure of dynamic program
+    * BackPointers and SubProblem classes: see below
     * build(): Build the DAG for the dynamic program (Boost Graph)
-    * computeTopK(k): At every node, store k 3-tuples: (edge, child solution, score of kth best solution for this subproblem)
+    * computeTopK(k): At every node, store 'SubProblem': k 3-tuples: (edge, child solution, score of kth best solution for this subproblem)
     * extractTopK(k): Returns a set of domains
-
-* Matrix: use the ublas matrix itself
-
+* WeightedIntervalScheduling
+    * WeighedInterval
+    * WeightedIntervalScheduler
+        * previousDisjointInterval()
+        * computeScheduling()
+        * extractIntervals()
 
 Testing:
 

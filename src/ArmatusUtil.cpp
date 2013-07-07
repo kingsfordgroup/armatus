@@ -25,6 +25,7 @@
 #include <boost/numeric/ublas/io.hpp>
 #include "ArmatusUtil.hpp"
 #include "ArmatusParams.hpp"
+#include "IntervalScheduling.hpp"
 
 using namespace std;
 
@@ -73,7 +74,39 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
  //    std::cerr << "M is " << symMat.size1() << " x " << symMat.size2() << ", with " << m.nnz() << " non-zero entries\n";
 }
 
+Domain::Domain(size_t s, size_t e) : start(s), end(e) { }
+
 double Domain::score(ArmatusParams& p) {
     size_t d = end-start;
     return std::max((p.sums(start, end)/ std::pow(static_cast<double>(d),p.gamma)) - p.mu[d], 0.0);
+}
+
+DomainSet consensus(DomainEnsemble dEnsemble) {
+    using PersistenceMap = map<Domain, int>;
+    PersistenceMap pmap;
+
+    for (auto dSet : dEnsemble) {
+        for (auto domain : dSet) {
+            if ( pmap.find(domain) == pmap.end() ) pmap[domain] = 0;
+            pmap[domain]++;
+        }
+    }
+
+    Intervals ivals;
+
+    for (auto domainPersistence : pmap) {
+        auto domain = domainPersistence.first;
+        auto persistence = domainPersistence.second;
+        ivals.push_back(WeightedInterval(domain.start, domain.end, persistence));      
+    }
+
+    IntervalScheduler scheduler(ivals);
+    scheduler.computeSchedule();
+
+    DomainSet dSet;
+    for (auto ival : scheduler.extractIntervals()) {
+        dSet.push_back(Domain(ival.start, ival.end));
+    }
+
+    return dSet;
 }
