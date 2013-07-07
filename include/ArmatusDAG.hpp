@@ -48,7 +48,7 @@ class ArmatusDAG {
 
     DomainSet viterbiPath();
 
-    void topK(uint32_t k);
+    void computeTopK(uint32_t k);
 };
 
 #endif // __ARMATUS_DAG_HPP__

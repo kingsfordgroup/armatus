@@ -127,7 +127,7 @@ DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax
         ArmatusParams params(A, gamma);
         ArmatusDAG G(params);
         G.build();
-        G.topK(k);
+        G.computeTopK(k);
         auto domains = G.viterbiPath();
         dEnsemble.push_back(domains);
 

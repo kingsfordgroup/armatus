@@ -62,7 +62,7 @@ double ArmatusDAG::q(size_t k, size_t l) {
 *  This interface is *wrong* but I wanted to sketch the
 *  basic algo.
 **/
-void ArmatusDAG::topK(uint32_t k) {
+void ArmatusDAG::computeTopK(uint32_t k) {
 
 	for (size_t l : boost::irange(size_t{2}, params->n)) {
 		auto BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
