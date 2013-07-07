@@ -27,7 +27,9 @@ class Domain {
 using DomainSet = std::vector<Domain>;
 using DomainEnsemble = std::vector<DomainSet>;
 
-DomainSet consensus(DomainEnsemble dEnsemble);
+DomainEnsemble multiscaleDomains(float gammaMax, float stepSize, int k);
+
+DomainSet consensusDomains(DomainEnsemble dEnsemble);
 
 
 #endif // __ARMATUS_UTIL_HPP__

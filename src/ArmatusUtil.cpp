@@ -35,6 +35,7 @@ shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
     auto m = make_shared<SparseMatrix>();
 
 	ifstream file(path, ios_base::in | ios_base::binary);
+    assert(file.good());
     boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
     in.push(boost::iostreams::gzip_decompressor());
     in.push(file);

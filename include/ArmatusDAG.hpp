@@ -46,7 +46,7 @@ class ArmatusDAG {
     
     double s(size_t k, size_t l);
 
-    vector<Domain> viterbiPath();
+    DomainSet viterbiPath();
 
     void topK(uint32_t k);
 };
