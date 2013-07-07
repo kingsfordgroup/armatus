@@ -1,6 +1,7 @@
 #include <limits>
 #include <boost/heap/binomial_heap.hpp>
 #include <boost/range/irange.hpp>
+#include <algorithm>
 #include "ArmatusDAG.hpp"
 
 ArmatusDAG::ArmatusDAG(ArmatusParams& p) :
@@ -107,6 +108,8 @@ vector<Domain> ArmatusDAG::viterbiPath() {
 		domains.push_back({begin+1, end});
 		end = begin;
 	}
+
+    sort(domains.begin(), domains.end());
 
 	return domains;
 }

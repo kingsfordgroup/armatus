@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -22,7 +24,8 @@ int main(int argc, char* argv[]) {
   using std::cerr;
 
 
-  struct params {
+  class Params {
+    public:
     string inputFile;
     string outputPrefix;
     double gammaMax;
@@ -31,7 +34,7 @@ int main(int argc, char* argv[]) {
     bool outputMultiscale;
   };
 
-  params p;
+  Params p;
 
   // Declare the supported options.
   po::options_description opts("armatus options");
@@ -42,7 +45,7 @@ int main(int argc, char* argv[]) {
   ("output,o", po::value<string>(&p.outputPrefix)->required(), "output filename prefix")
   ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")
   ("stepSize,s", po::value<double>(&p.stepSize)->default_value(0.05), "Step size to increment resolution parameter")
-  ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->default_value(false), "Output multiscale domains to files as well")
+  ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->zero_tokens()->default_value(false), "Output multiscale domains to files as well")
   ;
 
   po::variables_map vm;
@@ -58,12 +61,32 @@ int main(int argc, char* argv[]) {
     po::notify(vm);    
 
     if (vm.count("input")) {
+      if (p.outputMultiscale) cerr << "Multiresoultion ensemble will be written to files" << endl;
       cerr << "Reading input from " << p.inputFile << ".\n";
 
-  	  auto mat = parseGZipMatrix(p.inputFile);
+  	  auto matProp = parseGZipMatrix(p.inputFile);
+      auto mat = matProp.matrix;
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
 
-      auto domains = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
+      auto dEnsemble = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
+      auto dConsensus = consensusDomains(dEnsemble);
+
+
+      auto consensusFile = p.outputPrefix + ".consensus.txt";
+      cerr << "Writing consensus domains to: " << consensusFile << endl;;
+      outputDomains(dConsensus, consensusFile, matProp);
+
+      if (p.outputMultiscale) {
+        double gamma = 0;
+       cerr << "Writing multiscale domains" << endl;
+        for (auto dSet : dEnsemble) {
+          stringstream multiscaleFile;
+          multiscaleFile << p.outputPrefix << ".gamma." << std::setprecision(2) << gamma << ".txt";
+          outputDomains(dSet, multiscaleFile.str(),matProp);
+          gamma += p.stepSize;
+        }
+      }
+
 
     } else {
       cerr << "Input file was not set.\n";

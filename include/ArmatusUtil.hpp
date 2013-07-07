@@ -12,7 +12,14 @@ using namespace std;
 
 using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
 
-std::shared_ptr<SparseMatrix> parseGZipMatrix(string path);
+class MatrixProperties {
+    public:
+    std::shared_ptr<SparseMatrix> matrix;
+    std::string chrom;
+    int resolution;
+};
+
+MatrixProperties parseGZipMatrix(string path);
 
 class ArmatusParams;
 class Domain {
@@ -31,6 +38,8 @@ using DomainEnsemble = vector<DomainSet>;
 
 DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
 DomainSet consensusDomains(DomainEnsemble dEnsemble);
+
+void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp);
 
 
 #endif // __ARMATUS_UTIL_HPP__
