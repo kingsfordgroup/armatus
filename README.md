@@ -66,7 +66,7 @@ An example run on chromosome 1 of a human fibroblast:
 
 The first `-i` parameter is a gzipped HiC matrix for chromosome 1 as obtained from Dixon et al. the second `-g` parameter is the maximum gamma at which to sample at.  Output files are all written with a prefix `test`.
 
-Other options allow for sampling multiple near-optimal solutions and considering finer levels of step sizes. These are 'idealized' parameters in the sense that ideally we would sample as many resolutions as possible and consider the most solutions that are reasonably close to the optimal solution.
+Other options allow for sampling multiple near-optimal solutions and considering finer levels of step sizes. These are 'idealized' parameters in the sense that ideally we would sample as many resolutions as possible and consider all solutions that are reasonably close to the optimal solution.
 
 Components
 ----------
