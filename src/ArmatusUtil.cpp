@@ -14,7 +14,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <memory>
 
 #include <boost/range/irange.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
@@ -26,10 +25,10 @@
 #include "ArmatusUtil.hpp"
 #include "ArmatusParams.hpp"
 #include "IntervalScheduling.hpp"
+#include "ArmatusParams.hpp"
+#include "ArmatusDAG.hpp"
 
-using namespace std;
-
-shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
+std::shared_ptr<SparseMatrix> parseGZipMatrix(string path) {
 	cout << "parsing gzip " << path << endl;
 
     auto m = make_shared<SparseMatrix>();
@@ -111,3 +110,26 @@ DomainSet consensus(DomainEnsemble dEnsemble) {
 
     return dSet;
 }
+
+DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
+
+    DomainEnsemble dEnsemble;
+
+    for (double gamma=0; gamma <= gammaMax; gamma+=stepSize) {
+
+        cout << "Running domain-finding at gamma=" << gamma << endl;
+ 
+        ArmatusParams params(A, gamma);
+        ArmatusDAG G(params);
+        G.build();
+        G.topK(k);
+        auto domains = G.viterbiPath();
+        dEnsemble.push_back(domains);
+
+    }
+
+    return dEnsemble;
+}
+
+
+

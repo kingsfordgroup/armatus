@@ -91,7 +91,7 @@ void ArmatusDAG::topK(uint32_t k) {
 
 	size_t sln = 0;
 	while (sln < k and sln < subProbs[params->n-1].topK.size()) {
-		std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
+		//std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
 		++sln;
 	}
 }
@@ -100,7 +100,7 @@ vector<Domain> ArmatusDAG::viterbiPath() {
 	vector<Domain> domains;
 	const size_t INVALID = std::numeric_limits<size_t>::max();
 	size_t end = params->n-1;
-	std::cerr << "Best score is " << subProbs[end].topK[0].score << "\n";
+	//std::cerr << "Best score is " << subProbs[end].topK[0].score << "\n";
 
 	while (subProbs[end].topK[0].edge != INVALID) {
 		size_t begin = subProbs[end].topK[0].edge;

@@ -24,7 +24,7 @@ void ArmatusParams::computeSumMuSigma_() {
 
 	// A reference will be easier to work with here
 	SparseMatrix& M = *A;
-	std::cerr << "M is " << M.size1() << " x " << M.size2() << "\n";
+	//std::cerr << "M is " << M.size1() << " x " << M.size2() << "\n";
 
 	for (size_t i : boost::irange(size_t{0}, n)) {
 		sums(i, i) = M(i, i);
@@ -47,7 +47,7 @@ void ArmatusParams::computeSumMuSigma_() {
 	for (size_t i : boost::irange(size_t{0}, n)) {
 		mu[i] = mean(acc[i]);
 		// Require at least 100 samples to compute a Z-score
-		if (count(acc[i]) < 100) { 
+		if (boost::accumulators::count(acc[i]) < 100) { 
 			mu[i] = std::numeric_limits<double>::max();
 		}
 	}

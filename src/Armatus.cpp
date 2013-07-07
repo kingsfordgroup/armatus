@@ -3,8 +3,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "ArmatusParams.hpp"
-#include "ArmatusDAG.hpp"
 #include "Version.hpp"
 #include "ArmatusUtil.hpp"
 
@@ -23,12 +21,28 @@ int main(int argc, char* argv[]) {
   using std::string;
   using std::cerr;
 
+
+  struct params {
+    string inputFile;
+    string outputPrefix;
+    double gammaMax;
+    size_t k;
+    double stepSize;
+    bool outputMultiscale;
+  };
+
+  params p;
+
   // Declare the supported options.
   po::options_description opts("armatus options");
   opts.add_options()
   ("help,h", "produce help message")
-  ("input,i", po::value<string>()->required(), "input file")
-  ("gamma,g", po::value<double>()->required(), "gamma [scaling] parameter")
+  ("input,i", po::value<string>(&p.inputFile)->required(), "input file")
+  ("gammaMax,g", po::value<double>(&p.gammaMax)->required(), "gamma-max (highest resolution to generate domains)")
+  ("output,o", po::value<string>(&p.outputPrefix)->required(), "output filename prefix")
+  ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")
+  ("stepSize,s", po::value<double>(&p.stepSize)->default_value(0.05), "Step size to increment resolution parameter")
+  ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->default_value(false), "Output multiscale domains to files as well")
   ;
 
   po::variables_map vm;
@@ -44,20 +58,13 @@ int main(int argc, char* argv[]) {
     po::notify(vm);    
 
     if (vm.count("input")) {
-      cerr << "Reading input from " << vm["input"].as<string>() << ".\n";
-      // parse input matrix file
+      cerr << "Reading input from " << p.inputFile << ".\n";
 
-  	  auto mat = parseGZipMatrix(vm["input"].as<string>());
+  	  auto mat = parseGZipMatrix(p.inputFile);
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
-      ArmatusParams params(mat, vm["gamma"].as<double>());
-      ArmatusDAG G(params);
-      G.build();
-      G.topK(50);
-      // auto domains = G.viterbiPath();
-      // std::cerr << "Solution contained " << domains.size() << " domains\n";
-      // double totalScore = 0.0;
-      // for (auto& d : domains) { totalScore += d.score(params); }
-      // std::cerr << "Total solution score: " << totalScore << "\n";
+
+      auto domains = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
+
     } else {
       cerr << "Input file was not set.\n";
       std::exit(1);

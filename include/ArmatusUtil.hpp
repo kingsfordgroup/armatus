@@ -8,9 +8,11 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
 
+using namespace std;
+
 using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
 
-std::shared_ptr<SparseMatrix> parseGZipMatrix(std::string path);
+std::shared_ptr<SparseMatrix> parseGZipMatrix(string path);
 
 class ArmatusParams;
 class Domain {
@@ -24,11 +26,10 @@ class Domain {
     }
 };
 
-using DomainSet = std::vector<Domain>;
-using DomainEnsemble = std::vector<DomainSet>;
+using DomainSet = vector<Domain>;
+using DomainEnsemble = vector<DomainSet>;
 
-DomainEnsemble multiscaleDomains(float gammaMax, float stepSize, int k);
-
+DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
 DomainSet consensusDomains(DomainEnsemble dEnsemble);
 
 
