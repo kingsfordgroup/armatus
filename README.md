@@ -34,10 +34,10 @@ The main inputs into Armatus are the matrix file (in the format of Dixon et al.:
 
 An example run on chromosome 1 of a human fibroblast:
 
-    time armatus -i ~/IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz -g .5 -o test -m
+    time armatus -i IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz -g .5 -o test -m
 
     Multiresoultion ensemble will be written to files
-    Reading input from /Users/geet/IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz.
+    Reading input from IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz.
     chr1 at resolution 40000bp
     line 1000
     line 2000
