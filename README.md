@@ -1,6 +1,8 @@
 armatus
 =======
 
+![Logo](logo/ArmatusLogo.png)
+
 Installation
 ------------
 
