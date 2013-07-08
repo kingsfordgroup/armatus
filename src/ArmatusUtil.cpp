@@ -84,14 +84,16 @@ double Domain::score(ArmatusParams& p) {
     return std::max((p.sums(start, end)/ std::pow(static_cast<double>(d),p.gamma)) - p.mu[d], 0.0);
 }
 
-DomainSet consensusDomains(DomainEnsemble dEnsemble) {
-    using PersistenceMap = map<Domain, int>;
+DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble) {
+    using PersistenceMap = map<Domain, double>;
     PersistenceMap pmap;
 
-    for (auto dSet : dEnsemble) {
-        for (auto domain : dSet) {
+    for (auto dSetIdx : boost::irange(size_t{0}, dEnsemble.domainSets.size())) {
+        auto& dSet = dEnsemble.domainSets[dSetIdx];
+        auto weight = dEnsemble.weights[dSetIdx];
+        for (auto& domain : dSet) {
             if ( pmap.find(domain) == pmap.end() ) pmap[domain] = 0;
-            pmap[domain]++;
+            pmap[domain] += weight;
         }
     }
 
@@ -116,9 +118,9 @@ DomainSet consensusDomains(DomainEnsemble dEnsemble) {
     return dSet;
 }
 
-DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
+WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
 
-    DomainEnsemble dEnsemble;
+    WeightedDomainEnsemble dEnsemble;
 
     for (double gamma=0; gamma <= gammaMax; gamma+=stepSize) {
 
@@ -128,9 +130,14 @@ DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax
         ArmatusDAG G(params);
         G.build();
         G.computeTopK(k);
-        auto domains = G.viterbiPath();
-        dEnsemble.push_back(domains);
+        //auto domains = G.viterbiPath();
+        //dEnsemble.push_back(domains);
 
+        auto domainEnsemble = G.extractTopK(k);
+        auto& domains = domainEnsemble.domainSets;
+        auto& weights = domainEnsemble.weights;
+        dEnsemble.domainSets.insert(dEnsemble.domainSets.end(), domains.begin(), domains.end());
+        dEnsemble.weights.insert(dEnsemble.weights.end(), weights.begin(), weights.end());
     }
 
     return dEnsemble;

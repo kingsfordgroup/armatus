@@ -11,7 +11,7 @@ class WeightedInterval {
     int end;
     double score;
 
-    WeightedInterval(int s, int e, float sc);
+    WeightedInterval(int s, int e, double sc);
 
     bool operator< (const WeightedInterval &other) const {
         return end < other.end;

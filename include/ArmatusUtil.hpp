@@ -35,9 +35,15 @@ class Domain {
 
 using DomainSet = vector<Domain>;
 using DomainEnsemble = vector<DomainSet>;
+using Weights = vector<double>;
 
-DomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
-DomainSet consensusDomains(DomainEnsemble dEnsemble);
+struct WeightedDomainEnsemble {
+    DomainEnsemble domainSets;
+    Weights weights;
+};
+
+WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
+DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble);
 
 void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp);
 
