@@ -1,9 +1,10 @@
 armatus
 =======
 
+<img src="logo/ArmatusLogo.png", width=300/>
+
 Multiresolution domain calling software for chromosome conformation capture interaction matrices.
 
-<img src="logo/ArmatusLogo.png", width=300/>
 
 Installation
 ------------
