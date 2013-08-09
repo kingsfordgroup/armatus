@@ -1,3 +1,9 @@
+/* 
+  Authors: Darya Filippova, Geet Duggal, Rob Patro
+  dfilippo | geet | robp @cs.cmu.edu
+*/
+
+
 #include <iostream>
 #include <iomanip>
 #include <sstream>

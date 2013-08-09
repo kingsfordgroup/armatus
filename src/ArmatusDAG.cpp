@@ -1,3 +1,8 @@
+/* 
+    Authors: Darya Filippova, Geet Duggal, Rob Patro
+    dfilippo | geet | robp @cs.cmu.edu
+*/
+
 #include <limits>
 #include <boost/heap/binomial_heap.hpp>
 #include <boost/range/irange.hpp>

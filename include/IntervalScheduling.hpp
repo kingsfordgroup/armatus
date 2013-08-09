@@ -1,3 +1,8 @@
+/* 
+    Authors: Darya Filippova, Geet Duggal, Rob Patro
+    dfilippo | geet | robp @cs.cmu.edu
+*/
+
 #ifndef  __INTERVAL_SCHEDULING_HPP__
 #define  __INTERVAL_SCHEDULING_HPP__
 

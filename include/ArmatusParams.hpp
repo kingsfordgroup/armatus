@@ -1,3 +1,8 @@
+/* 
+    Authors: Darya Filippova, Geet Duggal, Rob Patro
+    dfilippo | geet | robp @cs.cmu.edu
+*/
+
 #ifndef __ARMATUS_PARAMS_HPP__
 #define __ARMATUS_PARAMS_HPP__
 
