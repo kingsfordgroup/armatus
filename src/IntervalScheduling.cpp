@@ -7,7 +7,7 @@
 #include "IntervalScheduling.hpp"
 #include <algorithm>
 
-WeightedInterval::WeightedInterval(int s, int e, float sc) {
+WeightedInterval::WeightedInterval(int s, int e, double sc) {
     if (s < e) {
         start = s;
         end = e;

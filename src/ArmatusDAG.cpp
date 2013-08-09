@@ -95,16 +95,69 @@ void ArmatusDAG::computeTopK(uint32_t k) {
 		}
 	}
 
-	size_t sln = 0;
-	while (sln < k and sln < subProbs[params->n-1].topK.size()) {
-		//std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
-		++sln;
-	}
+	// size_t sln = 0;
+	// while (sln < k and sln < subProbs[params->n-1].topK.size()) {
+	// 	std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
+	// 	++sln;
+	// }
+}
+
+
+WeightedDomainEnsemble ArmatusDAG::extractTopK(uint32_t k) {
+
+  const size_t INVALID = std::numeric_limits<size_t>::max();
+
+  // We skip 0 since that was already extracted by viterbiPath
+  uint32_t currSln{0};
+
+  WeightedDomainEnsemble solutions{ DomainEnsemble(k, DomainSet()), Weights(k, 0.0) };
+  auto root = params->n-1;
+  auto topScore = subProbs[root].topK[0].score;
+  auto scores = Weights(k, 0.0);
+
+  while (currSln < k and currSln < subProbs[root].topK.size()) {
+    auto currentScore = subProbs[root].topK[currSln].score;
+    scores[currSln] = currentScore;
+    auto& currentDomainSet = solutions.domainSets[currSln];
+    solutions.weights[currSln] = currentScore / topScore;
+
+    // Which solution to use at the child
+    auto bp = currSln;
+    size_t end = params->n-1;
+
+    while (subProbs[end].topK[bp].edge != INVALID) {
+      size_t begin = subProbs[end].topK[bp].edge;
+      currentDomainSet.push_back({begin+1, end});
+      bp = subProbs[end].topK[bp].childSolution;
+      end = begin;
+    }
+
+    ++currSln;
+  }
+
+  /**
+   * consistency check all the extracted domains (for debug purposes only, 
+   * take this out for release / speed).
+   */
+  size_t c = 0;
+  double eps = 1e-3;
+  for (auto& ds : solutions.domainSets) {
+    double score = 0.0;
+    for (auto& d : ds) {
+      score += d.score(*params);
+    }
+    if (std::abs(score - scores[c]) > eps) { 
+      std::cerr << "recorded score was " << scores[c] << " but extracted domains sum to " << score << "\n";
+    }
+    ++c;
+  }
+  
+  return solutions;
 }
 
 vector<Domain> ArmatusDAG::viterbiPath() {
 	vector<Domain> domains;
-	const size_t INVALID = std::numeric_limits<size_t>::max();
+  const size_t INVALID = std::numeric_limits<size_t>::max();
 	size_t end = params->n-1;
 	//std::cerr << "Best score is " << subProbs[end].topK[0].score << "\n";
 
