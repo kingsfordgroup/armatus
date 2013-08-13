@@ -5,7 +5,6 @@ armatus
 
 Multiresolution domain calling software for chromosome conformation capture interaction matrices.
 
-
 Installation
 ------------
 
