@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <cmath>
 
 #include <boost/range/irange.hpp>
 #include <boost/filesystem.hpp>
@@ -85,13 +86,18 @@ int main(int argc, char* argv[]) {
 
       if (p.outputMultiscale) {
         double gamma = 0;
+        size_t multiOptIdx = 0;
        cerr << "Writing multiscale domains" << endl;
         for (auto dSetIdx : boost::irange(size_t{0}, dEnsemble.domainSets.size())) {
           auto& dSet = dEnsemble.domainSets[dSetIdx];
           stringstream multiscaleFile;
-          multiscaleFile << p.outputPrefix << ".gamma." << std::setprecision(2) << gamma << ".txt";
+          multiscaleFile << p.outputPrefix << ".gamma." << std::fixed << std::setprecision(log10(p.gammaMax/p.stepSize)+1) << gamma << "." << setfill('0') << setw(log10(p.k)+1) << multiOptIdx << ".txt";
           outputDomains(dSet, multiscaleFile.str(),matProp);
-          gamma += p.stepSize;
+          multiOptIdx++;
+          if (multiOptIdx % p.k == 0)  {
+            gamma += p.stepSize;
+            multiOptIdx = 0;
+          }
         }
       }
 

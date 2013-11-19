@@ -67,14 +67,23 @@ double ArmatusDAG::q(size_t k, size_t l) {
 *  This interface is *wrong* but I wanted to sketch the
 *  basic algo.
 **/
+
+/*
+class BackPointerComparator {
+    bool operator()(const BackPointer& x, const BackPointer& y) {
+	    return (this->edgeWeights[l][x.edge] + this->subProbs[x.edge].topK[x.childSolution].score) < 
+    	       (this->edgeWeights[l][y.edge] + this->subProbs[y.edge].topK[y.childSolution].score);
+    }
+};
+*/
+
 void ArmatusDAG::computeTopK(uint32_t k) {
 
 	for (size_t l : boost::irange(size_t{2}, params->n)) {
-		auto BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
+		std::function<bool (const BackPointer&, const BackPointer&)> BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
 			return (this->edgeWeights[l][x.edge] + this->subProbs[x.edge].topK[x.childSolution].score) < 
 			       (this->edgeWeights[l][y.edge] + this->subProbs[y.edge].topK[y.childSolution].score);
 		};
-
 
 		boost::heap::binomial_heap<BackPointer,
 		                           boost::heap::compare<decltype(BackPointerComparator)>> pq(BackPointerComparator);
@@ -84,10 +93,11 @@ void ArmatusDAG::computeTopK(uint32_t k) {
 		}
 
 		while (subProbs[l].topK.size() < k and !pq.empty()) {
-			auto& bp = pq.top();
+			auto bp = pq.top();
 			pq.pop();
 			if (bp != subProbs[l].topK.back()) { subProbs[l].topK.push_back(bp); }
 			size_t nextSlnIdx = bp.childSolution + 1;
+            //std::cout << bp.edge << "\t" << subProbs.size() << endl;
 			if (nextSlnIdx < subProbs[bp.edge].topK.size()) {
 				double score = edgeWeights[l][k-1] + subProbs[k-1].topK[nextSlnIdx].score;
 				pq.push({k-1, nextSlnIdx, score});
