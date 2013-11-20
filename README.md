@@ -32,6 +32,11 @@ Using CMake to compile Armatus:
 
 Make sure you substitute `$HOME/boost` with the installation path you desire.
 
+WARNING
+-------
+
+We have noticed that occassionally, the *order* of the arguments passed can result in a memory bug that is yet unexplained since we are using the Boost argument parser.  We are working to resolve this issue.  If you experience this issue, place the "-m" argument before the "-k" argument.
+
 Example Run
 -----------
 
