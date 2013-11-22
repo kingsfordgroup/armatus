@@ -137,7 +137,10 @@ WeightedDomainEnsemble ArmatusDAG::extractTopK(uint32_t k) {
 
     while (subProbs[end].topK[bp].edge != INVALID) {
       size_t begin = subProbs[end].topK[bp].edge;
-      currentDomainSet.push_back({begin+1, end});
+      Domain d(begin+1, end);
+      if (d.score(*params) > 0.0){
+         currentDomainSet.push_back(d);
+      }
       bp = subProbs[end].topK[bp].childSolution;
       end = begin;
     }

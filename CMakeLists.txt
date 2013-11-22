@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ARMATUS)
 
-set(CMAKE_CXX_FLAGS "-O2 -std=c++11 -stdlib=libc++ -Wall")
+set(CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall")
 
 set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
