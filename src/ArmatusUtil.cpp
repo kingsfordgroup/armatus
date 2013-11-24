@@ -63,6 +63,7 @@ MatrixProperties parseGZipMatrix(string path) {
 
     	++i;
         if ( i % 1000 == 0 ) { std::cerr << "line " << i << "\n"; }
+        if (incoming.eof()) break;
     }
     //std::cerr << "Avg edge " << tot / nedge << " sum " << tot  << " cnt " << nedge << "\n";
     return prop;
@@ -73,7 +74,7 @@ MatrixProperties parseGZipMatrix(string path) {
 Domain::Domain(size_t s, size_t e) : start(s), end(e) { }
 
 double Domain::score(ArmatusParams& p) {
-    size_t d = end-start;
+    size_t d = end-start+1;
     return std::max((p.sums(start, end)/ std::pow(static_cast<double>(d),p.gamma)) - p.mu[d], 0.0);
 }
 
@@ -141,7 +142,7 @@ void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp) {
     file.open(fname);
     int res = matProp.resolution;
     for (auto d : dSet) {
-        file << matProp.chrom << "\t" << d.start*res << "\t" << d.end*res << endl;
+        file << matProp.chrom << "\t" << (d.start+1)*res << "\t" << (d.end+1)*res << endl;
     }
     file.close();
 }
