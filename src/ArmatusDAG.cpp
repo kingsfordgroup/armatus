@@ -21,37 +21,34 @@ void ArmatusDAG::build() {
 	// necessary information to obtain a backtrace of the opt. sln.
 	subProbs[0].topK.push_back({std::numeric_limits<size_t>::max(), 0, 0.0});
 	// What's the right condition here?
-	subProbs[1].topK.push_back({std::numeric_limits<size_t>::max(), 0, q(0,1)});	
+	// subProbs[1].topK.push_back({0, 0, std::max(q(0,1), 0.0)});	
 	
-    for (size_t l : boost::irange(size_t{2}, params->n)) {
+    for (size_t l : boost::irange(size_t{1}, params->n)) {
         // was this
   	    // edgeWeights[l].resize(l-1);
         // now this
   	    edgeWeights[l].resize(l);
-  	    size_t chosenEdge = 0;
+  	    size_t chosenEdge = 0; 
   	    double bestScore = 0.0;
   	    for (size_t k : boost::irange(size_t{0}, l)) {
   	    	// The last domain is [k,l]
   	    	double edgeWeight = std::max(q(k, l), 0.0);
             edgeWeights[l][k] = edgeWeight;
-
+            double totalScore = edgeWeight;
+            bool isDomain = edgeWeight > 0.0;
+            bool isPrevDomain = (k == 0) ? true : false;
             if (k > 0) {
+                double prevDomainScore = subProbs[k-1].topK[0].score; 
+                isPrevDomain = prevDomainScore > 0.0;
                 // The score of this solution is the benefit we get from traversing
                 // the edge + the best score available at the child
-                double thisScore = edgeWeight + subProbs[k-1].topK[0].score;
-
-                // If this is the best derivation of this subproblem so far
-                // then record it.
-                if (thisScore > bestScore) {
-                    bestScore = thisScore;
-                    chosenEdge = k;
-                }
-            } else {
-                double thisScore = edgeWeight;
-                if (thisScore > bestScore) {
-                    bestScore = thisScore;
-                    chosenEdge = 0;
-                }
+                totalScore += prevDomainScore;
+             }
+             if (isDomain or isPrevDomain) {
+                 if (totalScore > bestScore) {
+                     bestScore = totalScore;
+                     chosenEdge = k;
+                 }
             }
   	    }
 
@@ -75,18 +72,8 @@ double ArmatusDAG::q(size_t k, size_t l) {
 *  This interface is *wrong* but I wanted to sketch the
 *  basic algo.
 **/
-
-/*
-class BackPointerComparator {
-    bool operator()(const BackPointer& x, const BackPointer& y) {
-	    return (this->edgeWeights[l][x.edge] + this->subProbs[x.edge].topK[x.childSolution].score) < 
-    	       (this->edgeWeights[l][y.edge] + this->subProbs[y.edge].topK[y.childSolution].score);
-    }
-};
-*/
-
 void ArmatusDAG::computeTopK(uint32_t k) {
-	for (size_t l : boost::irange(size_t{2}, params->n)) {
+	for (size_t l : boost::irange(size_t{1}, params->n)) {
 		std::function<bool (const BackPointer&, const BackPointer&)> BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
             auto scoreX = this->edgeWeights[l][x.edge];
             if (x.edge > 0) { scoreX += this->subProbs[x.edge-1].topK[x.childSolution].score; }
@@ -101,9 +88,10 @@ void ArmatusDAG::computeTopK(uint32_t k) {
 		for (size_t j : boost::irange(size_t{0}, l)) { 
             if (j > 0) {
                 size_t i = j - 1;
-                bool isDomain = edgeWeights[l][j] > 0; 
+                bool isDomain = edgeWeights[l][j] > 0.0; 
                 bool prevIsDomain = (subProbs[i].topK.size() > 0 and edgeWeights[i].size() > 0) ? edgeWeights[i][subProbs[i].topK[0].edge] > 0 : true;
-
+                if (j == 1) { prevIsDomain = false; }
+                 
                 if (isDomain or prevIsDomain) {
                     double score = edgeWeights[l][j] + subProbs[i].topK[0].score;
                     pq.push({j, 0, score});
@@ -119,21 +107,22 @@ void ArmatusDAG::computeTopK(uint32_t k) {
 			pq.pop();
             size_t j = bp.edge;
             if (j > 0) {
-                if (bp != subProbs[l].topK.back()) { subProbs[l].topK.push_back(bp); }
+                bool alreadyFound{false};
+                if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
                 size_t nextSlnIdx = bp.childSolution + 1;
-                bool isDomain = edgeWeights[l][j] > 0;
+                bool isDomain = edgeWeights[l][j] > 0.0;
                 
                 size_t i = j - 1;
                 //std::cout << bp.edge << "\t" << subProbs.size() << endl;
                 if (nextSlnIdx < subProbs[i].topK.size()) {
-                    bool isPrevDomain = edgeWeights[i][subProbs[i].topK[nextSlnIdx].edge] > 0;
-                    if (isDomain or isPrevDomain) {
+                    bool prevIsDomain = edgeWeights[i][subProbs[i].topK[nextSlnIdx].edge] > 0.0;
+                    if (isDomain or prevIsDomain ) {
                         double score = edgeWeights[l][j] + subProbs[i].topK[nextSlnIdx].score;
                         pq.push({j, nextSlnIdx, score});
                     }
                 }
             } else {
-                if (bp != subProbs[l].topK.back()) { subProbs[l].topK.push_back(bp); }
+                if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
             }
 		}
 	}
@@ -166,8 +155,12 @@ WeightedDomainEnsemble ArmatusDAG::extractTopK(uint32_t k) {
     // Which solution to use at the child
     auto bp = currSln;
     int64_t end = params->n-1;
+    bool prevWasDomain = true;
+    bool done{false};
+    Domain prevDomain(root, root);
 
-    while (end >= 0 and subProbs[end].topK[bp].edge != INVALID) {
+    while (end > 0) { // and subProbs[end].topK[bp].edge != INVALID) {
+      //std::cerr << "end: " << end << "\n";
       size_t begin = subProbs[end].topK[bp].edge;
       size_t start = begin;
 //      if (subProbs[begin].topK[subProbs[end].topK[bp].childSolution].edge != INVALID)
@@ -175,10 +168,18 @@ WeightedDomainEnsemble ArmatusDAG::extractTopK(uint32_t k) {
       Domain d(start, end);
       if (d.score(*params) > 0.0){
          currentDomainSet.push_back(d);
+         prevWasDomain = true;
+      } else {
+         //currentDomainSet.push_back(d);
+        if (!prevWasDomain) { 
+                std::cerr << "WHAT: solution contained two adjacent non-domains; current domain is (" << start << ", " << end << ") prev domain was (" << prevDomain.start << ", " << prevDomain.end << ")\n"; 
+        }
+        prevWasDomain = false;
       }
+      prevDomain = d;
       bp = subProbs[end].topK[bp].childSolution;
       end = begin-1;
-    }
+   }
 
     ++currSln;
   }
