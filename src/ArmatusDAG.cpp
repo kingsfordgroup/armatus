@@ -73,25 +73,25 @@ double ArmatusDAG::q(size_t k, size_t l) {
 *  basic algo.
 **/
 void ArmatusDAG::computeTopK(uint32_t k) {
-	for (size_t l : boost::irange(size_t{1}, params->n)) {
-		std::function<bool (const BackPointer&, const BackPointer&)> BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
+    for (size_t l : boost::irange(size_t{1}, params->n)) {
+        std::function<bool (const BackPointer&, const BackPointer&)> BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
             auto scoreX = this->edgeWeights[l][x.edge];
             if (x.edge > 0) { scoreX += this->subProbs[x.edge-1].topK[x.childSolution].score; }
             auto scoreY = this->edgeWeights[l][y.edge];
             if (y.edge > 0) { scoreY += this->subProbs[y.edge-1].topK[y.childSolution].score; }
 
-			return scoreX < scoreY;
-		};
+            return scoreX < scoreY;
+        };
 
-		boost::heap::binomial_heap<BackPointer,
-		                           boost::heap::compare<decltype(BackPointerComparator)>> pq(BackPointerComparator);
-		for (size_t j : boost::irange(size_t{0}, l)) { 
+        boost::heap::binomial_heap<BackPointer,
+            boost::heap::compare<decltype(BackPointerComparator)>> pq(BackPointerComparator);
+        for (size_t j : boost::irange(size_t{0}, l)) { 
             if (j > 0) {
                 size_t i = j - 1;
                 bool isDomain = edgeWeights[l][j] > 0.0; 
                 bool prevIsDomain = (subProbs[i].topK.size() > 0 and edgeWeights[i].size() > 0) ? edgeWeights[i][subProbs[i].topK[0].edge] > 0 : true;
                 if (j == 1) { prevIsDomain = false; }
-                 
+
                 if (isDomain or prevIsDomain) {
                     double score = edgeWeights[l][j] + subProbs[i].topK[0].score;
                     pq.push({j, 0, score});
@@ -100,18 +100,18 @@ void ArmatusDAG::computeTopK(uint32_t k) {
                 double score = edgeWeights[l][0];
                 pq.push({0, 0, score});
             }
-		}
+        }
 
-		while (subProbs[l].topK.size() < k and !pq.empty()) {
-			auto bp = pq.top();
-			pq.pop();
+        while (subProbs[l].topK.size() < k and !pq.empty()) {
+            auto bp = pq.top();
+            pq.pop();
             size_t j = bp.edge;
             if (j > 0) {
                 bool alreadyFound{false};
                 if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
                 size_t nextSlnIdx = bp.childSolution + 1;
                 bool isDomain = edgeWeights[l][j] > 0.0;
-                
+
                 size_t i = j - 1;
                 //std::cout << bp.edge << "\t" << subProbs.size() << endl;
                 if (nextSlnIdx < subProbs[i].topK.size()) {
@@ -124,14 +124,14 @@ void ArmatusDAG::computeTopK(uint32_t k) {
             } else {
                 if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
             }
-		}
-	}
+        }
+    }
 
-	// size_t sln = 0;
-	// while (sln < k and sln < subProbs[params->n-1].topK.size()) {
-	// 	std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
-	// 	++sln;
-	// }
+    // size_t sln = 0;
+    // while (sln < k and sln < subProbs[params->n-1].topK.size()) {
+    // 	std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
+    // 	++sln;
+    // }
 }
 
 
