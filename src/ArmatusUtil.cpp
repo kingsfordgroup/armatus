@@ -115,8 +115,9 @@ DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble) {
 WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
 
     WeightedDomainEnsemble dEnsemble;
+    double eps = 1e-5;
 
-    for (double gamma=0; gamma <= gammaMax; gamma+=stepSize) {
+    for (double gamma=0; gamma <= gammaMax+eps; gamma+=stepSize) {
 
         cerr << "gamma=" << gamma << endl;
  
