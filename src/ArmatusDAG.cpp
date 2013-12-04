@@ -54,6 +54,7 @@ void ArmatusDAG::build() {
 
   	    // Put our best solution on the stack.
   	    subProbs[l].topK.push_back({chosenEdge, 0, bestScore});
+        cout << "OPTIMAL SCORE: " << bestScore << endl;
     }
 }
 
