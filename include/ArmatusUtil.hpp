@@ -47,6 +47,7 @@ struct WeightedDomainEnsemble {
     Weights weights;
 };
 
+void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma);
 WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
 DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble);
 

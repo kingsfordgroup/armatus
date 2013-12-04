@@ -15,11 +15,12 @@
 class ArmatusParams {
   using SymmetricMatrix = boost::numeric::ublas::symmetric_matrix<double, boost::numeric::ublas::upper>;
   public:
-    explicit ArmatusParams(std::shared_ptr<SparseMatrix> _A, double _gamma);
+    explicit ArmatusParams(std::shared_ptr<SparseMatrix> _A, double _gamma, size_t Kp);
     void computeSumMuSigma_();
     std::shared_ptr<SparseMatrix> A;
     SymmetricMatrix sums;
     size_t n;
+    size_t K;
     double gamma;
     std::vector<double> mu;
 };

@@ -1,222 +1,90 @@
-/* 
-    Authors: Darya Filippova, Geet Duggal, Rob Patro
-    dfilippo | geet | robp @cs.cmu.edu
-*/
-
-#include <limits>
-#include <boost/heap/binomial_heap.hpp>
-#include <boost/range/irange.hpp>
-#include <algorithm>
 #include "ArmatusDAG.hpp"
 
-ArmatusDAG::ArmatusDAG(ArmatusParams& p) :
-	subProbs(SubProbsVec(p.n)), 
-    edgeWeights(EdgeWeightsVec(p.n, vector<double>())) {
+/*
+
+OPT(l) = max{  max_{ k<l } OPTD(k-1),  // OPT(l) ends in a non-domain
+               OPTD(l) }               // OPT(l) ends in a domain
+
+OPTD(l) = max_{ k<l } OPT(k-1) + q(k,l)
+
+q(k,l) = {  s(k,l)   if s(k,l) > 0,
+            -inf     otherwise  }
+
+OPT(0) = OPT(1) = OPTD(0) = OPTD(1) = 0
+
+*/
+
+ArmatusDAG::ArmatusDAG(ArmatusParams& p) : 
+    OPT(vector<SubProblem>(p.n+1)),
+    OPTD(vector<SubProblem>(p.n+1)) { 
 	params = &p;
-}
-
-void ArmatusDAG::build() {
-	// Since building the DAG visits everything in the same order as computing
-	// a single optimial solution, I've had this function also fill out the
-	// necessary information to obtain a backtrace of the opt. sln.
-	subProbs[0].topK.push_back({std::numeric_limits<size_t>::max(), 0, 0.0});
-	// What's the right condition here?
-	// subProbs[1].topK.push_back({0, 0, std::max(q(0,1), 0.0)});	
-	
-    for (size_t l : boost::irange(size_t{1}, params->n)) {
-        // was this
-  	    // edgeWeights[l].resize(l-1);
-        // now this
-  	    edgeWeights[l].resize(l);
-  	    size_t chosenEdge = 0; 
-  	    double bestScore = 0.0;
-  	    for (size_t k : boost::irange(size_t{0}, l)) {
-  	    	// The last domain is [k,l]
-  	    	double edgeWeight = std::max(q(k, l), 0.0);
-            edgeWeights[l][k] = edgeWeight;
-            double totalScore = edgeWeight;
-            bool isDomain = edgeWeight > 0.0;
-            bool isPrevDomain = (k == 0) ? true : false;
-            if (k > 0) {
-                double prevDomainScore = subProbs[k-1].topK[0].score; 
-                isPrevDomain = prevDomainScore > 0.0;
-                // The score of this solution is the benefit we get from traversing
-                // the edge + the best score available at the child
-                totalScore += prevDomainScore;
-             }
-             if (isDomain or isPrevDomain) {
-                 if (totalScore > bestScore) {
-                     bestScore = totalScore;
-                     chosenEdge = k;
-                 }
-            }
-  	    }
-
-  	    // Put our best solution on the stack.
-  	    subProbs[l].topK.push_back({chosenEdge, 0, bestScore});
+    for (size_t l=0; l <= p.n; l++) {
+       OPT[l].score.resize(p.K); 
+       OPTD[l].score.resize(p.K); 
     }
 }
-
 
 double ArmatusDAG::s(size_t k, size_t l) {
 	size_t d = l-k+1;
-    return params->sums(k, l)/ std::pow(static_cast<double>(d),params->gamma);
+    return params->sums(k-1, l-1)/ std::pow(static_cast<double>(d),params->gamma);
 }
 
+
+/*
+q(k,l) = {  s(k,l)   if s(k,l) > 0,
+            -inf     otherwise }
+*/
 double ArmatusDAG::q(size_t k, size_t l) {
 	size_t d = l-k+1;
-	return (s(k, l) - params->mu[d]);
+    double score = (s(k, l) - params->mu[d]);
+    if (score > 0) return score;
+	return -std::numeric_limits<double>::infinity();
 }
 
-/**
-*  This interface is *wrong* but I wanted to sketch the
-*  basic algo.
-**/
-void ArmatusDAG::computeTopK(uint32_t k) {
-    for (size_t l : boost::irange(size_t{1}, params->n)) {
-        std::function<bool (const BackPointer&, const BackPointer&)> BackPointerComparator = [l, this] (const BackPointer& x, const BackPointer& y) -> bool {
-            auto scoreX = this->edgeWeights[l][x.edge];
-            if (x.edge > 0) { scoreX += this->subProbs[x.edge-1].topK[x.childSolution].score; }
-            auto scoreY = this->edgeWeights[l][y.edge];
-            if (y.edge > 0) { scoreY += this->subProbs[y.edge-1].topK[y.childSolution].score; }
-
-            return scoreX < scoreY;
-        };
-
-        boost::heap::binomial_heap<BackPointer,
-            boost::heap::compare<decltype(BackPointerComparator)>> pq(BackPointerComparator);
-        for (size_t j : boost::irange(size_t{0}, l)) { 
-            if (j > 0) {
-                size_t i = j - 1;
-                bool isDomain = edgeWeights[l][j] > 0.0; 
-                bool prevIsDomain = (subProbs[i].topK.size() > 0 and edgeWeights[i].size() > 0) ? edgeWeights[i][subProbs[i].topK[0].edge] > 0 : true;
-                if (j == 1) { prevIsDomain = false; }
-
-                if (isDomain or prevIsDomain) {
-                    double score = edgeWeights[l][j] + subProbs[i].topK[0].score;
-                    pq.push({j, 0, score});
-                }
-            } else {
-                double score = edgeWeights[l][0];
-                pq.push({0, 0, score});
-            }
-        }
-
-        while (subProbs[l].topK.size() < k and !pq.empty()) {
-            auto bp = pq.top();
-            pq.pop();
-            size_t j = bp.edge;
-            if (j > 0) {
-                bool alreadyFound{false};
-                if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
-                size_t nextSlnIdx = bp.childSolution + 1;
-                bool isDomain = edgeWeights[l][j] > 0.0;
-
-                size_t i = j - 1;
-                //std::cout << bp.edge << "\t" << subProbs.size() << endl;
-                if (nextSlnIdx < subProbs[i].topK.size()) {
-                    bool prevIsDomain = edgeWeights[i][subProbs[i].topK[nextSlnIdx].edge] > 0.0;
-                    if (isDomain or prevIsDomain ) {
-                        double score = edgeWeights[l][j] + subProbs[i].topK[nextSlnIdx].score;
-                        pq.push({j, nextSlnIdx, score});
-                    }
-                }
-            } else {
-                if (bp != subProbs[l].topK[0] ) { subProbs[l].topK.push_back(bp); }
-            }
-        }
+void ArmatusDAG::build() {
+    // OPTD(0) = OPTD(1) = 0 for all K near-optimal solutions
+    for (size_t i=0; i<params->K; i++) {
+        OPT[0].score[i] = OPT[1].score[i] = 0;
+        OPTD[0].score[i] = OPTD[1].score[i] = 0;
     }
 
-    // size_t sln = 0;
-    // while (sln < k and sln < subProbs[params->n-1].topK.size()) {
-    // 	std::cerr << "solution " << sln << " has score " << subProbs[params->n-1].topK[sln].score << "\n";
-    // 	++sln;
-    // }
+    // Build optimal solutions for l=2 to n
+    for (size_t l=2; l<=params->n; l++) {
+        double scoreDomain, scoreNonDomain;
+        scoreDomain = scoreNonDomain = -std::numeric_limits<double>::infinity();
+
+        // max_{ k<l } OPTD( k-1 )
+        for (size_t k=1; k<l; k++) {
+            if (OPTD[k-1].score[0] > scoreNonDomain) {
+                scoreNonDomain = OPTD[k-1].score[0];
+            }
+        }
+
+        // OPTD(l) = max_{ k<l } OPT(k-1) + q(k,l)
+        for (size_t k=1; k<l; k++) {
+            //cout << "k=" << k << " l=" << l << " q(k,l)=" << q(k,l) << endl;
+            double candidateScore = OPT[k-1].score[0] + q(k,l);
+            if (candidateScore > scoreDomain) {
+                scoreDomain = candidateScore;
+            }
+        }
+        OPTD[l].score[0] = scoreDomain;
+
+        /*  OPT(l) = max{  max_{ k<l } OPTD(k-1),  // OPT(l) ends in a non-domain
+                           OPTD(l) }               // OPT(l) ends in a domain     */
+        if (scoreNonDomain > scoreDomain) {
+            OPT[l].score[0] = scoreNonDomain;
+        } else {
+            OPT[l].score[0] = scoreDomain;
+        }
+    }
+    cout << "OPTIMAL SCORE: " << OPT[params->n].score[0] << endl;
+}
+
+void ArmatusDAG::computeTopK(uint32_t k) {
 }
 
 
 WeightedDomainEnsemble ArmatusDAG::extractTopK(uint32_t k) {
-
-  const size_t INVALID = std::numeric_limits<size_t>::max();
-  // We skip 0 since that was already extracted by viterbiPath
-  uint32_t currSln{0};
-
-  WeightedDomainEnsemble solutions{ DomainEnsemble(k, DomainSet()), Weights(k, 0.0) };
-  auto root = params->n-1;
-  auto topScore = subProbs[root].topK[0].score;
-  auto scores = Weights(k, 0.0);
-
-  while (currSln < k and currSln < subProbs[root].topK.size()) {
-    auto currentScore = subProbs[root].topK[currSln].score;
-    scores[currSln] = currentScore;
-    auto& currentDomainSet = solutions.domainSets[currSln];
-    solutions.weights[currSln] = currentScore / topScore;
-
-    // Which solution to use at the child
-    auto bp = currSln;
-    int64_t end = params->n-1;
-    bool prevWasDomain = true;
-    bool done{false};
-    Domain prevDomain(root, root);
-
-    while (end > 0) { // and subProbs[end].topK[bp].edge != INVALID) {
-      //std::cerr << "end: " << end << "\n";
-      size_t begin = subProbs[end].topK[bp].edge;
-      size_t start = begin;
-//      if (subProbs[begin].topK[subProbs[end].topK[bp].childSolution].edge != INVALID)
-//         start++;
-      Domain d(start, end);
-      if (d.score(*params) > 0.0){
-         currentDomainSet.push_back(d);
-         prevWasDomain = true;
-      } else {
-         //currentDomainSet.push_back(d);
-        if (!prevWasDomain) { 
-                std::cerr << "WHAT: solution contained two adjacent non-domains; current domain is (" << start << ", " << end << ") prev domain was (" << prevDomain.start << ", " << prevDomain.end << ")\n"; 
-        }
-        prevWasDomain = false;
-      }
-      prevDomain = d;
-      bp = subProbs[end].topK[bp].childSolution;
-      end = begin-1;
-   }
-
-    ++currSln;
-  }
-
-  /**
-   * consistency check all the extracted domains (for debug purposes only, 
-   * take this out for release / speed).
-   */
-  size_t c = 0;
-  double eps = 1e-3;
-  for (auto& ds : solutions.domainSets) {
-    double score = 0.0;
-    for (auto& d : ds) {
-      score += d.score(*params);
-    }
-    if (std::abs(score - scores[c]) > eps) { 
-      std::cerr << "For solution [" << c << "], the recorded score was " << scores[c] << " but extracted domains sum to " << score << "\n";
-    }
-    ++c;
-  }
-  
-  return solutions;
 }
 
-vector<Domain> ArmatusDAG::viterbiPath() {
-	vector<Domain> domains;
-  const size_t INVALID = std::numeric_limits<size_t>::max();
-	size_t end = params->n-1;
-	//std::cerr << "Best score is " << subProbs[end].topK[0].score << "\n";
-
-	while (subProbs[end].topK[0].edge != INVALID) {
-		size_t begin = subProbs[end].topK[0].edge;
-		domains.push_back({begin+1, end});
-		end = begin;
-	}
-
-    sort(domains.begin(), domains.end());
-
-	return domains;
-}

@@ -8,6 +8,7 @@
 
 #include "ArmatusUtil.hpp"
 #include "ArmatusParams.hpp"
+#include <vector>
 
 using namespace boost;
 using namespace std;
@@ -16,42 +17,23 @@ class ArmatusDAG {
     private:
     ArmatusParams * params;
 
-    class BackPointer {
-        public:
-        size_t edge;
-        size_t childSolution;
-        double score;
-        bool operator==(const BackPointer &other) const { 
-            return (edge == other.edge) and (childSolution == other.childSolution) and
-                   (score == other.score);
-        }
-        bool operator!=(const BackPointer &other) const { 
-            return !((*this) == other);
-        }
-    };
-
     class SubProblem {
         public:
-        vector<BackPointer> topK;
+        vector<double> score;
     };
 
-    using SubProbsVec = vector<SubProblem>;
-    SubProbsVec subProbs;
-
-    using EdgeWeightsVec = vector< vector<double> >;
-    EdgeWeightsVec edgeWeights;
+    vector<SubProblem> OPT;
+    vector<SubProblem> OPTD;
 
     public:
     
     explicit ArmatusDAG(ArmatusParams &p);
     
-    void build();
-
     double q(size_t k, size_t l);
     
     double s(size_t k, size_t l);
 
-    DomainSet viterbiPath();
+    void build();
 
     void computeTopK(uint32_t k);
 
