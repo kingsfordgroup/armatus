@@ -8,6 +8,7 @@
 
 #include "ArmatusUtil.hpp"
 #include "ArmatusParams.hpp"
+#include <vector>
 
 using namespace boost;
 using namespace std;
@@ -16,46 +17,39 @@ class ArmatusDAG {
     private:
     ArmatusParams * params;
 
-    class BackPointer {
-        public:
-        size_t edge;
-        size_t childSolution;
-        double score;
-        bool operator==(const BackPointer &other) const { 
-            return (edge == other.edge) and (childSolution == other.childSolution) and
-                   (score == other.score);
-        }
-        bool operator!=(const BackPointer &other) const { 
-            return !((*this) == other);
-        }
-    };
-
     class SubProblem {
         public:
-        vector<BackPointer> topK;
+        double score;
+        size_t backPointer;
+        size_t backOptimalIndex;
+        bool operator<( const SubProblem & other ) const {
+           return score < other.score;
+        }
+        bool operator==( const SubProblem & other) const {
+           return (score == other.score and
+                   backPointer == other.backPointer and
+                   backOptimalIndex == other.backOptimalIndex);
+        }
     };
 
-    using SubProbsVec = vector<SubProblem>;
-    SubProbsVec subProbs;
-
-    using EdgeWeightsVec = vector< vector<double> >;
-    EdgeWeightsVec edgeWeights;
-
     public:
-    
+
+    using SubProbMatrix = vector<vector<SubProblem>>;
+    SubProbMatrix OPT;
+    SubProbMatrix OPTD;
+
     explicit ArmatusDAG(ArmatusParams &p);
     
-    void build();
-
     double q(size_t k, size_t l);
     
     double s(size_t k, size_t l);
 
-    DomainSet viterbiPath();
+    void build();
 
-    void computeTopK(uint32_t k);
+    void computeTopK();
 
-    WeightedDomainEnsemble extractTopK(uint32_t k);
+    DomainSet extractDomains(size_t i);
+    WeightedDomainEnsemble extractTopK();
 };
 
 #endif // __ARMATUS_DAG_HPP__

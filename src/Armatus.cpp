@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
 
       auto dEnsemble = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
+
       cerr << "Domain ensemble size: " << dEnsemble.domainSets.size() << endl;
       auto dConsensus = consensusDomains(dEnsemble);
 
@@ -113,7 +114,6 @@ int main(int argc, char* argv[]) {
     std::exit(1);
   }
 
-  
 
   return 0;
 }

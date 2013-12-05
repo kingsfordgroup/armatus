@@ -112,6 +112,12 @@ DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble) {
     return dSet;
 }
 
+void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma) {
+    ArmatusParams params(A, gamma, 1);
+    ArmatusDAG G(params);
+    G.build();
+}
+
 WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
 
     WeightedDomainEnsemble dEnsemble;
@@ -121,14 +127,12 @@ WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float 
 
         cerr << "gamma=" << gamma << endl;
  
-        ArmatusParams params(A, gamma);
+        ArmatusParams params(A, gamma, k);
         ArmatusDAG G(params);
         G.build();
-        G.computeTopK(k);
-        //auto domains = G.viterbiPath();
-        //dEnsemble.push_back(domains);
+        G.computeTopK();
 
-        auto domainEnsemble = G.extractTopK(k);
+        auto domainEnsemble = G.extractTopK();
         auto& domains = domainEnsemble.domainSets;
         auto& weights = domainEnsemble.weights;
         dEnsemble.domainSets.insert(dEnsemble.domainSets.end(), domains.begin(), domains.end());
@@ -146,6 +150,11 @@ void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp) {
         file << matProp.chrom << "\t" << (d.start+1)*res << "\t" << (d.end+1)*res << endl;
     }
     file.close();
+}
+
+void sanityCheck(WeightedDomainEnsemble e) {
+    for (auto dset : e.domainSets) {
+    }
 }
 
 
