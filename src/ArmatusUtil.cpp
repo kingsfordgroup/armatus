@@ -130,11 +130,9 @@ WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float 
         ArmatusParams params(A, gamma, k);
         ArmatusDAG G(params);
         G.build();
-        G.computeTopK(k);
-        //auto domains = G.viterbiPath();
-        //dEnsemble.push_back(domains);
+        G.computeTopK();
 
-        auto domainEnsemble = G.extractTopK(k);
+        auto domainEnsemble = G.extractTopK();
         auto& domains = domainEnsemble.domainSets;
         auto& weights = domainEnsemble.weights;
         dEnsemble.domainSets.insert(dEnsemble.domainSets.end(), domains.begin(), domains.end());
@@ -152,6 +150,11 @@ void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp) {
         file << matProp.chrom << "\t" << (d.start+1)*res << "\t" << (d.end+1)*res << endl;
     }
     file.close();
+}
+
+void sanityCheck(WeightedDomainEnsemble e) {
+    for (auto dset : e.domainSets) {
+    }
 }
 
 

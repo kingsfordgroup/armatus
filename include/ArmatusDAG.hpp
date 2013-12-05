@@ -19,14 +19,25 @@ class ArmatusDAG {
 
     class SubProblem {
         public:
-        vector<double> score;
+        double score;
+        size_t backPointer;
+        size_t backOptimalIndex;
+        bool operator<( const SubProblem & other ) const {
+           return score < other.score;
+        }
+        bool operator==( const SubProblem & other) const {
+           return (score == other.score and
+                   backPointer == other.backPointer and
+                   backOptimalIndex == other.backOptimalIndex);
+        }
     };
 
-    vector<SubProblem> OPT;
-    vector<SubProblem> OPTD;
-
     public:
-    
+
+    using SubProbMatrix = vector<vector<SubProblem>>;
+    SubProbMatrix OPT;
+    SubProbMatrix OPTD;
+
     explicit ArmatusDAG(ArmatusParams &p);
     
     double q(size_t k, size_t l);
@@ -35,9 +46,10 @@ class ArmatusDAG {
 
     void build();
 
-    void computeTopK(uint32_t k);
+    void computeTopK();
 
-    WeightedDomainEnsemble extractTopK(uint32_t k);
+    DomainSet extractDomains(size_t i);
+    WeightedDomainEnsemble extractTopK();
 };
 
 #endif // __ARMATUS_DAG_HPP__

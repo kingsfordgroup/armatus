@@ -76,9 +76,6 @@ int main(int argc, char* argv[]) {
       auto mat = matProp.matrix;
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
 
-      optimalDomains(mat, p.gammaMax);
-
-      /*
       auto dEnsemble = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
 
       cerr << "Domain ensemble size: " << dEnsemble.domainSets.size() << endl;
@@ -106,7 +103,6 @@ int main(int argc, char* argv[]) {
         }
       }
 
-  */ 
 
     } else {
       cerr << "Input file was not set.\n";
