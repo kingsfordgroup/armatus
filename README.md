@@ -32,6 +32,12 @@ Using CMake to compile Armatus:
 
 Make sure you substitute `$HOME/boost` with the installation path you desire.
 
+Here is one-liner to compile Armatus with G++ given you have the proper dependencies:
+
+     g++ -std=c++11 -w -lboost_system -lboost_iostreams -lboost_program_options -L /opt/local/lib/ -I include/ -I /opt/local/include/ -O3 -o binaries/armatus-linux-x64 src/*.cpp 
+
+Note that this assumes you have Boost installed in "/opt/local".
+
 WARNING
 -------
 
@@ -40,7 +46,12 @@ We have noticed that occassionally, the *order* of the arguments passed can resu
 Example Run
 -----------
 
-The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.
+The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.  *Note*: we recently noticed that the format of the matrices of Dixon et al. in the link above has changed.  If you use their data, please make sure it's in the following tab-separated format:
+
+    chr19  40000  80000  10  0   1  0 ...
+
+where the first three columns represent the chromosome name with the fragment start and end positions.  The fields following represent the interaction frequencies for that
+fragment.
 
 An example run on chromosome 1 of a human fibroblast:
 
@@ -77,6 +88,9 @@ An example run on chromosome 1 of a human fibroblast:
 The first `-i` parameter is a gzipped HiC matrix for chromosome 1 as obtained from Dixon et al. the second `-g` parameter is the maximum gamma at which to sample at.  Output files are all written with a prefix `test`.
 
 Other options allow for sampling multiple near-optimal solutions and considering finer levels of step sizes. These are 'idealized' parameters in the sense that ideally we would sample as many resolutions as possible and consider all solutions that are reasonably close to the optimal solution.
+
+We have also added a simple example in the "examples/" directory for your convenience.
+
 
 Components
 ----------
