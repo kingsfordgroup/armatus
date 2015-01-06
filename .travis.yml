@@ -27,5 +27,5 @@ script:
         - mkdir build
         - cd build
         - cmake ..
-        - travis_wait 45 make
+        - travis_wait 20 make
           #- travis_wait make install
