@@ -34,7 +34,7 @@ class Domain {
     size_t end;
     double score(ArmatusParams& p);
     bool operator< (const Domain &other) const {
-        return end < other.end;
+        return std::make_tuple(start, end) < std::make_tuple(other.start, other.end);
     }
 };
 

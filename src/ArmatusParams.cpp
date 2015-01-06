@@ -15,6 +15,7 @@
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/median.hpp>
 
 #include "ArmatusParams.hpp"
 
@@ -30,6 +31,7 @@ void ArmatusParams::computeSumMuSigma_() {
 	// Vector to hold accumulators that will compute the mean
 	// for domains of each size.
 	std::vector<accumulator_set<double,stats<tag::mean, tag::count>>> acc(n+1);
+	//std::vector<accumulator_set<double,stats<tag::median(with_p_square_quantile), tag::count>>> acc(n+1);
 
 	// A reference will be easier to work with here
 	SparseMatrix& M = *A;
@@ -65,6 +67,7 @@ void ArmatusParams::computeSumMuSigma_() {
     //std::cerr << "[ ";
 	for (size_t i : boost::irange(size_t{0}, n+1)) {
 		mu[i] = mean(acc[i]);
+        //mu[i] = median(acc[i]);
 		// Require at least 100 samples to compute a Z-score
 		if (boost::accumulators::count(acc[i]) < 100) { 
 			mu[i] = std::numeric_limits<double>::max();
