@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
     double gammaMax;
     size_t k;
     double stepSize;
+    int minMeanSamples;
     bool outputMultiscale;
   };
 
@@ -47,13 +48,14 @@ int main(int argc, char* argv[]) {
   // Declare the supported options.
   po::options_description opts("armatus options");
   opts.add_options()
-  ("help,h", "produce help message")
-  ("input,i", po::value<string>(&p.inputFile)->required(), "input file")
   ("gammaMax,g", po::value<double>(&p.gammaMax)->required(), "gamma-max (highest resolution to generate domains)")
-  ("output,o", po::value<string>(&p.outputPrefix)->required(), "output filename prefix")
-  ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")
-  ("stepSize,s", po::value<double>(&p.stepSize)->default_value(0.05), "Step size to increment resolution parameter")
+  ("help,h", "produce help message")
+  ("input,i", po::value<string>(&p.inputFile)->required(), "input matrix file, expected format (tab-separated): <chromo>\\t<start>\\t<end>\\t<f1 f2 ...>")
+  ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")  
   ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->zero_tokens()->default_value(false), "Output multiscale domains to files as well")
+  ("minMeanSamples,n", po::value<int>(&p.minMeanSamples)->default_value(100), "Minimum required number of samples to compute a mean")
+  ("output,o", po::value<string>(&p.outputPrefix)->required(), "output filename prefix")  
+  ("stepSize,s", po::value<double>(&p.stepSize)->default_value(0.05), "Step size to increment resolution parameter")
   ;
 
   po::variables_map vm;
@@ -76,7 +78,7 @@ int main(int argc, char* argv[]) {
       auto mat = matProp.matrix;
       cerr << "MatrixParser read matrix of size: " << mat->size1() << " x " << mat->size2()  << "\n";
 
-      auto dEnsemble = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k);
+      auto dEnsemble = multiscaleDomains(mat, p.gammaMax, p.stepSize, p.k, p.minMeanSamples);
 
       cerr << "Domain ensemble size: " << dEnsemble.domainSets.size() << endl;
       auto dConsensus = consensusDomains(dEnsemble);
@@ -89,7 +91,7 @@ int main(int argc, char* argv[]) {
       if (p.outputMultiscale) {
         double gamma = 0;
         size_t multiOptIdx = 0;
-       cerr << "Writing multiscale domains" << endl;
+        cerr << "Writing multiscale domains" << endl;
         for (auto dSetIdx : boost::irange(size_t{0}, dEnsemble.domainSets.size())) {
           auto& dSet = dEnsemble.domainSets[dSetIdx];
           stringstream multiscaleFile;

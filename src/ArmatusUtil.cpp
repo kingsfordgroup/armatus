@@ -21,6 +21,8 @@
 #include "ArmatusParams.hpp"
 #include "ArmatusDAG.hpp"
 
+string matrix_format_error = "Invalid matrix format. Expected format: \n<chromoID>\t<fragment_start>\t<fragment_end>\t<row of entries>";
+
 MatrixProperties parseGZipMatrix(string path) {
 	MatrixProperties prop;
 
@@ -44,9 +46,27 @@ MatrixProperties parseGZipMatrix(string path) {
 		boost::split(parts, line, boost::is_any_of("\t"));
         
         if (firstLine) { 
+            if (parts.size() - 3 < 100) {
+                cerr << "[INFO] Matrix is smaller than the recommended minimum size of 101." << endl;
+                // exit(1);
+            }
             prop.matrix->resize(parts.size() - 3, parts.size() - 3, false);
             prop.chrom = parts[0];
-            prop.resolution = atoi(parts[2].c_str())-atoi(parts[1].c_str());
+
+            int start = 0, end = 0;
+            try {
+                end = stoi(parts[2]);
+                start = stoi(parts[1]);
+                if (start >= end) {
+                    cerr << "[ERROR] " << matrix_format_error << endl;
+                }
+            }
+            catch (std::invalid_argument & ex) {
+                cerr << "[ERROR] " << matrix_format_error << endl;
+                cerr << ex.what() << endl;
+                exit(1);
+            }
+            prop.resolution = end - start;
             cerr << prop.chrom << " at resolution " << prop.resolution << "bp" << endl;
             firstLine = false;
         }
@@ -65,18 +85,13 @@ MatrixProperties parseGZipMatrix(string path) {
         if ( i % 1000 == 0 ) { std::cerr << "line " << i << "\n"; }
         if (incoming.eof()) break;
     }
-    //std::cerr << "Avg edge " << tot / nedge << " sum " << tot  << " cnt " << nedge << "\n";
     return prop;
-	// SparseSymmetricMatrix symMat(m);
- //    std::cerr << "M is " << symMat.size1() << " x " << symMat.size2() << ", with " << m.nnz() << " non-zero entries\n";
 }
+
+// domain size
+double d(size_t const & i, size_t const & j) {return j - i + 1;}
 
 Domain::Domain(size_t s, size_t e) : start(s), end(e) { }
-
-double Domain::score(ArmatusParams& p) {
-    size_t d = end-start+1;
-    return std::max((p.sums(start, end)/ std::pow(static_cast<double>(d),p.gamma)) - p.mu[d], 0.0);
-}
 
 DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble) {
     using PersistenceMap = map<Domain, double>;
@@ -112,13 +127,8 @@ DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble) {
     return dSet;
 }
 
-void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma) {
-    ArmatusParams params(A, gamma, 1);
-    ArmatusDAG G(params);
-    G.build();
-}
-
-WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k) {
+WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, 
+    float gammaMax, double stepSize, int k, int minMeanSamples) {
 
     WeightedDomainEnsemble dEnsemble;
     double eps = 1e-5;
@@ -127,8 +137,8 @@ WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float 
 
         cerr << "gamma=" << gamma << endl;
  
-        ArmatusParams params(A, gamma, k);
-        ArmatusDAG G(params);
+        ArmatusParams params(A, gamma, k, minMeanSamples); // k parameter is not used for anything in Params
+        ArmatusDAG G(params); // but is used in the DAG
         G.build();
         G.computeTopK();
 

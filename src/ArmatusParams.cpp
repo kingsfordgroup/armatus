@@ -19,9 +19,9 @@
 
 #include "ArmatusParams.hpp"
 
-ArmatusParams::ArmatusParams(std::shared_ptr<SparseMatrix> Ap, double gammap, size_t Kp) :
+ArmatusParams::ArmatusParams(std::shared_ptr<SparseMatrix> Ap, double gammap, size_t Kp, int minMeanSamples) :
  A(Ap), n(Ap->size1()), gamma(gammap), mu(std::vector<double>(Ap->size1()+1)),
- sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())), K(Kp) {
+ sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())), K(Kp), minMeanSamples(minMeanSamples) {
  computeSumMuSigma_();
 }
 
@@ -35,16 +35,10 @@ void ArmatusParams::computeSumMuSigma_() {
 
 	// A reference will be easier to work with here
 	SparseMatrix& M = *A;
-	//std::cerr << "M is " << M.size1() << " x " << M.size2() << "\n";
 
 	for (size_t i : boost::irange(size_t{0}, n)) {
 		sums(i, i) = M(i, i);
 	}
-
-
-    ofstream asums;
-    asums.open("../Asums.txt");
-
 
 	for (size_t i : boost::irange(size_t{1}, n)) {
 		std::vector<double> columnSums(i+1);
@@ -52,27 +46,19 @@ void ArmatusParams::computeSumMuSigma_() {
 		for (size_t j : boost::adaptors::reverse(boost::irange(size_t{0}, i))) {
 			columnSums[j] = columnSums[j+1] + M(j, i);
 			sums(j, i) = sums(j, i-1) + columnSums[j];
-			//sums(i, j) = sums(j, i);
-
-			int d = i - j + 1;
-			double s = sums(j, i) / std::pow(static_cast<double>(d), gamma);
-            if (d == 10) {
-                asums << s << endl;
-            }
-		    acc[d](s);
+			int d_i = d(j,i);
+			assert(d_i >= 0);
+			double s = sums(j, i) / std::pow(static_cast<double>(d_i), gamma);
+		    acc[d_i](s);
 		}
 	}
-    asums.close();
-    //std::cerr << sums << "\n";	
-    //std::cerr << "[ ";
+
 	for (size_t i : boost::irange(size_t{0}, n+1)) {
 		mu[i] = mean(acc[i]);
         //mu[i] = median(acc[i]);
 		// Require at least 100 samples to compute a Z-score
-		if (boost::accumulators::count(acc[i]) < 100) { 
+		if (boost::accumulators::count(acc[i]) < minMeanSamples) { 
 			mu[i] = std::numeric_limits<double>::max();
 		}
-        //std::cerr << i << " : (" << mu[i] << ") ";
 	}
-    //std::cerr << "]\n";
 }

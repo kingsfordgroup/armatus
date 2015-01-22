@@ -26,6 +26,8 @@ class MatrixProperties {
 
 MatrixProperties parseGZipMatrix(string path);
 
+double d(size_t const & i, size_t const & j);
+
 class ArmatusParams;
 class Domain {
     public:
@@ -47,8 +49,9 @@ struct WeightedDomainEnsemble {
     Weights weights;
 };
 
-void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma);
-WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k);
+// void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma);
+
+WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k, int minMeanSamples);
 DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble);
 
 void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp);

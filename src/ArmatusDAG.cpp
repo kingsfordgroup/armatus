@@ -34,8 +34,8 @@ ArmatusDAG::ArmatusDAG(ArmatusParams& p) :
 }
 
 double ArmatusDAG::s(size_t k, size_t l) {
-	size_t d = l-k+1;
-    return params->sums(k-1, l-1)/ std::pow(static_cast<double>(d),params->gamma);
+    size_t d_i = d(k,l);
+    return params->sums(k-1, l-1)/ std::pow(static_cast<double>(d_i),params->gamma);
 }
 
 
@@ -44,8 +44,8 @@ q(k,l) = {  s(k,l)   if s(k,l) > 0,
             -inf     otherwise }
 */
 double ArmatusDAG::q(size_t k, size_t l) {
-	size_t d = l-k+1;
-    double score = (s(k, l) - params->mu[d]);
+    size_t d_i = d(k,l);
+    double score = (s(k, l) - params->mu[d_i]);
     if (score > 0) return score;
 	return -std::numeric_limits<double>::infinity();
 }
