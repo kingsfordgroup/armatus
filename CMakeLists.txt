@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 project(ARMATUS)
 
 ## Prefer static to dynamic libraries
-SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+## We have to build boost on TravisCI each time for this, so avoid it for now
+#SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 set(CMAKE_CXX_FLAGS "-O3 -g -std=c++11 -Wall")
 
