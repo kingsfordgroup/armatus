@@ -7,12 +7,12 @@ mkdir $HOME/Armatus-latest_ubuntu-12.04/lib
 
 # copy over the executable 
 echo -e "Copying over the binary and Intel TBB libraries\n"
-cp $TRAVIS_BUILD_DIR/bin/armatus $HOME/Armatus-latest_ubuntu-12.04/bin/
-cp $TRAVIS_BUILD_DIR/lib/libtbb* $HOME/Armatus-latest_ubuntu-12.04/lib/
+cp $TRAVIS_BUILD_DIR/build/src/armatus $HOME/Armatus-latest_ubuntu-12.04/bin/
+#cp $TRAVIS_BUILD_DIR/lib/libtbb* $HOME/Armatus-latest_ubuntu-12.04/lib/
 
 # copy other dependencies (shared libraries)
 echo -e "Copying over other shared library dependencies\n"
-bash $TRAVIS_BUILD_DIR/scripts/cpld.bash $TRAVIS_BUILD_DIR/bin/armatus $HOME/Armatus-latest_ubuntu-12.04/lib/
+bash $TRAVIS_BUILD_DIR/scripts/cpld.bash $TRAVIS_BUILD_DIR/build/src/armatus $HOME/Armatus-latest_ubuntu-12.04/lib/
 echo -e "Removing dangerous dependencies\n"
 rm $HOME/Armatus-latest_ubuntu-12.04/lib/libc.so.6
 rm $HOME/Armatus-latest_ubuntu-12.04/lib/ld-linux-x86-64.so.2
