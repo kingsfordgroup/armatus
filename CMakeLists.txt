@@ -2,7 +2,26 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ARMATUS)
 
+## Prefer static to dynamic libraries
+SET(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
 set(CMAKE_CXX_FLAGS "-O3 -g -std=c++11 -Wall")
+
+set (USING_GCC FALSE)
+set (USING_CLANG FALSE)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    set (USING_GCC TRUE)
+    set (USING_CLANG FALSE)
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    set (USING_CLANG TRUE)
+    set (USING_GCC FALSE)
+endif ()
+
+if (USING_GCC)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+endif ()
+
 
 set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -29,3 +29,10 @@ script:
         - cmake ..
         - travis_wait 20 make
           #- travis_wait make install
+
+after_success:
+    - cd $TRAVIS_BUILD_DIR
+    - ./scripts/push-binary.sh
+
+after_failure:
+    - cat $TRAVIS_BUILD_DIR/build/Testing/Temporary/LastTest.log
