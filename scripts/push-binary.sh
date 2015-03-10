@@ -31,8 +31,8 @@ echo -e "Getting previous asset ID\n"
 ASSETID=`curl -s -X GET https://api.github.com/repos/kingsfordgroup/armatus/releases/879640/assets | grep "\"id" | head -1 | awk '{gsub(/,$/,""); print $2}'`
 # Delete the previous tarball
 echo -e "Deleting previous asset\n"
-curl -X DELETE -H "Authorization: token ae2cb942be590a7164823b55080674832ce6d5c2" https://api.github.com/repos/kingsfordgroup/armatus/releases/assets/$ASSETID
+curl -X DELETE -H "Authorization: token ${ARMATUS_PUSH_KEY}" https://api.github.com/repos/kingsfordgroup/armatus/releases/assets/$ASSETID
 # Upload the new tarball
 echo -e "Uploading new asset\n"
-curl -X POST --data-binary "@Armatus-latest_ubuntu-12.04.tar.gz" https://uploads.github.com/repos/kingsfordgroup/armatus/releases/879640/assets?name=Armatus-latest_ubuntu-12.04.tar.gz --header "Content-Type:application/gzip" -H "Authorization: token ae2cb942be590a7164823b55080674832ce6d5c2"
+curl -X POST --data-binary "@Armatus-latest_ubuntu-12.04.tar.gz" https://uploads.github.com/repos/kingsfordgroup/armatus/releases/879640/assets?name=Armatus-latest_ubuntu-12.04.tar.gz --header "Content-Type:application/gzip" -H "Authorization: token ${ARMATUS_PUSH_KEY}"
 echo -e "Done!\n"
