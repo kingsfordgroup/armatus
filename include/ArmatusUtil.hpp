@@ -15,7 +15,8 @@
 
 using namespace std;
 
-using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
+//using SparseMatrix = boost::numeric::ublas::compressed_matrix<double>;
+using SparseMatrix = boost::numeric::ublas::matrix<double>;
 
 class MatrixProperties {
     public:
@@ -24,7 +25,8 @@ class MatrixProperties {
     int resolution;
 };
 
-MatrixProperties parseGZipMatrix(string path);
+MatrixProperties parseGZipMatrix(string path, int resolution, string chrom);
+MatrixProperties parseRaoMatrix(string path, int resolution, string chrom, bool noNormalization);
 
 double d(size_t const & i, size_t const & j);
 
@@ -43,15 +45,19 @@ class Domain {
 using DomainSet = vector<Domain>;
 using DomainEnsemble = vector<DomainSet>;
 using Weights = vector<double>;
+using Resolutions = vector<double>;
+using OptIndex = vector<size_t>;
 
 struct WeightedDomainEnsemble {
     DomainEnsemble domainSets;
     Weights weights;
+    Resolutions resolutions;
+    OptIndex optidx;
 };
 
 // void optimalDomains(std::shared_ptr<SparseMatrix> A, float gamma);
 
-WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k, int minMeanSamples);
+WeightedDomainEnsemble multiscaleDomains(std::shared_ptr<SparseMatrix> A, float gammaMax, double stepSize, int k, int minMeanSamples, bool justThisGamma);
 DomainSet consensusDomains(WeightedDomainEnsemble& dEnsemble);
 
 void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp);

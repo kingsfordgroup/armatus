@@ -46,7 +46,9 @@ q(k,l) = {  s(k,l)   if s(k,l) > 0,
 double ArmatusDAG::q(size_t k, size_t l) {
     size_t d_i = d(k,l);
     double score = (s(k, l) - params->mu[d_i]);
-    if (score > 0) return score;
+    if (score > 0) {
+        return score;
+    }
 	return -std::numeric_limits<double>::infinity();
 }
 
