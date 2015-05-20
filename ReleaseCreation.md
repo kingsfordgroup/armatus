@@ -12,8 +12,6 @@ In order to make a new release, you should do the following.
 
    git push origin —tags 
 
-you can also push just a single tag if you want "> git push origin vX.X"
-
 3. Go to GitHub and, under the "Releases" tab (https://github.com/kingsfordgroup/armatus/releases) click "Draft a new release"
 
 4. From the box at the top left that says "Tag version", select the tag you just pushed, and fill out the rest of the release info as desired
