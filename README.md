@@ -65,13 +65,7 @@ We have noticed that occassionally, the *order* of the arguments passed can resu
 Example Run
 -----------
 
-The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.  *Note*: we recently noticed that the format of the matrices of Dixon et al. in the link above has changed.  If you use their data, please make sure it's in the following tab-separated format:
-
-    chr19  40000  80000  10  0   1  0 ...
-
-where the first three columns represent the chromosome name with the fragment start and end positions.  The fields following represent the interaction frequencies for that
-fragment.
-
+The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.  *Note*: we recently noticed that the format of the matrices of Dixon et al. in the link above has changed.
 An example run on chromosome 1 of a human fibroblast:
 
     time armatus -i IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz -g .5 -o test -m
