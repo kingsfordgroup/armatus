@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
   ("gammaMax,g", po::value<double>(&p.gammaMax)->required(), "gamma-max (highest resolution to generate domains)")
   ("justGammaMax,j", po::value<bool>(&p.justGammaMax)->zero_tokens()->default_value(false), "Just obtain domains at the maximum Gamma")
   ("help,h", "produce help message")
-  ("input,i", po::value<string>(&p.inputFile)->required(), "input matrix file, expected format (tab-separated): <chromo>\\t<start>\\t<end>\\t<f1 f2 ...>")
+  ("input,i", po::value<string>(&p.inputFile)->required(), "input matrix file")
   ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")  
   ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->zero_tokens()->default_value(false), "Output multiscale domains to files as well")
   ("resolution,r", po::value<int>(&p.resolution)->default_value(40000), "Resolution of data")

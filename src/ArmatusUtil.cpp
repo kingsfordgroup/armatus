@@ -23,7 +23,6 @@
 #include "ArmatusParams.hpp"
 #include "ArmatusDAG.hpp"
 
-string matrix_format_error = "Invalid matrix format. Expected format: \n<chromoID>\t<fragment_start>\t<fragment_end>\t<row of entries>";
 
 MatrixProperties parseGZipMatrix(string path, int resolution, string chrom) {
 	MatrixProperties prop;
@@ -31,6 +30,10 @@ MatrixProperties parseGZipMatrix(string path, int resolution, string chrom) {
     prop.matrix = std::make_shared<SparseMatrix>();
 
 	ifstream file(path, ios_base::in | ios_base::binary);
+    if (!file.good()) {
+        std::cerr << "Couldn't read file " << path << std::endl;
+        std::exit(1);
+    }
     assert(file.good());
     boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
     in.push(boost::iostreams::gzip_decompressor());
@@ -59,6 +62,19 @@ MatrixProperties parseGZipMatrix(string path, int resolution, string chrom) {
             cerr << prop.chrom << " at resolution " << prop.resolution << "bp" << endl;
             firstLine = false;
         }
+
+        if (parts.size() != prop.matrix->size2()) {
+            std::cerr << "Error: row " << i << " has " << parts.size() 
+                      << " entries, but I was expecting " << prop.matrix->size2() << std::endl;
+            std::exit(3);
+        }
+
+        if (i >= prop.matrix->size2()) {
+            std::cerr << "Error: I was expecting " << prop.matrix->size2() 
+                      << " rows, but there are more than that in the matrix file." << std::endl;
+            std::exit(3);
+        }
+
         
         for (size_t j : boost::irange(i, parts.size())) {
             double e  = stod(parts[j]);
@@ -74,6 +90,13 @@ MatrixProperties parseGZipMatrix(string path, int resolution, string chrom) {
         if ( i % 1000 == 0 ) { std::cerr << "line " << i << "\n"; }
         if (incoming.eof()) break;
     }
+
+    // check that we read # of rows = to the number of columns in the matrix
+    if (prop.matrix->size2() != i) {
+        std::cerr << "Error: it doesn't look like your matrix file had enough rows." << std::endl;
+        std::cerr << "Error: expecting " << prop.matrix->size2() << " but saw " << i << std::endl;
+        std::exit(1);
+    }
     return prop;
 }
 
@@ -85,6 +108,10 @@ MatrixProperties parseRaoMatrix(string path, int resolution, string chrom, bool 
 
     {
 	    ifstream file(rawCountPath);
+        if (!file.good()) {
+            std::cerr << "Couldn't read file: " << rawCountPath << std::endl;
+            std::exit(1);
+        }
         assert(file.good());
 
         string line;
