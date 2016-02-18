@@ -256,7 +256,7 @@ void outputDomains(DomainSet dSet, string fname, MatrixProperties matProp) {
     file.open(fname);
     int res = matProp.resolution;
     for (auto d : dSet) {
-        file << matProp.chrom << "\t" << (d.start)*res << "\t" << (d.end)*res << endl;
+        file << matProp.chrom << "\t" << (d.start)*res << "\t" << (d.end+1)*res-1 << endl;
     }
     file.close();
 }
