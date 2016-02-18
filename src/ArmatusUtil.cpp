@@ -28,7 +28,7 @@ string matrix_format_error = "Invalid matrix format. Expected format: \n<chromoI
 MatrixProperties parseGZipMatrix(string path, int resolution, string chrom) {
 	MatrixProperties prop;
 
-    prop.matrix = make_shared<SparseMatrix>();
+    prop.matrix = std::make_shared<SparseMatrix>();
 
 	ifstream file(path, ios_base::in | ios_base::binary);
     assert(file.good());
@@ -114,7 +114,7 @@ MatrixProperties parseRaoMatrix(string path, int resolution, string chrom, bool 
         }
     }
     cout << "Initializing matrix to zero elements" << endl;
-    prop.matrix = make_shared<SparseMatrix>(n,n,M);
+    prop.matrix = std::make_shared<SparseMatrix>(n,n,M);
     for (int i = 0; i < n; i++) {
         for (int j =0; j < n; j++) {
             prop.matrix->insert_element(i,j, 0.0);
