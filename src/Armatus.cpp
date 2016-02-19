@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
   ("input,i", po::value<string>(&p.inputFile)->required(), "input matrix file")
   ("topK,k", po::value<size_t>(&p.k)->default_value(1), "Compute the top k optimal solutions")  
   ("outputMultiscale,m", po::value<bool>(&p.outputMultiscale)->zero_tokens()->default_value(false), "Output multiscale domains to files as well")
-  ("resolution,r", po::value<int>(&p.resolution)->default_value(40000), "Resolution of data")
+  ("resolution,r", po::value<int>(&p.resolution)->default_value(1), "Resolution of data")
   ("chromosome,c", po::value<string>(&p.chrom)->default_value("N/A"), "Chromosome")
   ("minMeanSamples,n", po::value<int>(&p.minMeanSamples)->default_value(100), "Minimum required number of samples to compute a mean")
   ("output,o", po::value<string>(&p.outputPrefix)->required(), "output filename prefix")  
