@@ -9,3 +9,5 @@ link_directories(${Boost_LIBRARY_DIR})
 
 add_executable(armatus ${ARMATUS_MAIN})
 target_link_libraries(armatus ${Boost_LIBRARIES} z)
+
+install (TARGETS armatus DESTINATION bin)
