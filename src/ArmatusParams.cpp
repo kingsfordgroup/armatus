@@ -21,8 +21,14 @@
 #include "ArmatusParams.hpp"
 
 ArmatusParams::ArmatusParams(std::shared_ptr<SparseMatrix> Ap, double gammap, size_t Kp, int minMeanSamples) :
- A(Ap), n(Ap->size1()), gamma(gammap), mu(std::vector<double>(Ap->size1()+1)),
- sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())), K(Kp), minMeanSamples(minMeanSamples) {
+    A(Ap), 
+    sums(ArmatusParams::SymmetricMatrix(Ap->size1(), Ap->size2())), 
+    n(Ap->size1()), 
+    K(Kp), 
+    minMeanSamples(minMeanSamples),
+    gamma(gammap), 
+    mu(std::vector<double>(Ap->size1()+1))
+{
  computeSumMuSigma_();
 }
 
