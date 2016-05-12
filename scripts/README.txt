@@ -44,12 +44,13 @@ Optional arguments:
 
 
 Example runs:
-
+The Hi-C data file for the first example can be found by downloading the Human IMR90 Fibroblast Normalized Matrices data set from http://chromosome.sdsc.edu/mouse/hi-c/download.html, and using the normalized matrix from chromosome 20 (filename: nij.chr20)
 Running the following line will show chromosome 20 from Dixon et al. (resolution = 40kb), comparing Armatus consensus domains with Dixon domains
 
 python HiCvis.py -i example/nij.chr20 -d1 example/chr20armatus.consensus.txt -d2 example/chr20dixondomains -dr2 40000 -l1 ArmatusConsensus -l2 Dixon
 
 
+The Hi-C data file for this second example can be found by downloading the GSE63525_GM12878_primary_intrachromosomal_contact_matrices.tar.gz file from http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE63525 . In this example we used 10kb resolution, so the file will be chr17_10kb.RAWobserved. 
 Using Rao data for chromosome 17, comparing consensus Armatus domains vs gamma = 0 for a window from locus 2500 to 3000:
 
 python HiCvis.py -i example/chr17_10kb.RAWobserved -r 10000 -d1 example/RaoChr17_10kb.consensus.txt -d2 example/RaoChr17_10kb.gamma.0.0.txt -l1 ArmatusConsensus -l2 ArmatusGamma=0 -b 2500 3000
