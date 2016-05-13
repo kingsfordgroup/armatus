@@ -1,3 +1,5 @@
+#!/usr/env python
+
 import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
@@ -151,3 +153,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.i, args.r, args.d1, args.d2, args.dr1, args.dr2, args.b, args.l1, args.l2, args.o)
+
