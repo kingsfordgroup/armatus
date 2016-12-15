@@ -179,7 +179,7 @@ Make sure you substitute `$HOME/boost` with the installation path you desire.
 
 Here is one-liner to compile Armatus with G++ given you have the proper dependencies:
 
-     g++ -std=c++11 -w -lboost_system -lboost_iostreams -lboost_program_options -L /opt/local/lib/ -I include/ -I /opt/local/include/ -O3 -o binaries/armatus-linux-x64 src/*.cpp 
+    g++ -std=c++11 -w -L /opt/local/lib/ -I include/ -I /opt/local/include/ -O3 -o binaries/armatus-linux-x64 src/*.cpp -lboost_iostreams -lboost_program_options -lboost_system
 
 Note that this assumes you have Boost installed in "/opt/local".
 
