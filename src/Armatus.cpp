@@ -45,6 +45,7 @@ int main(int argc, char* argv[]) {
     bool outputMultiscale;
     bool raoFormat;
     bool noNormalization;  // No normalization, just raw counts (Rao format)
+    bool sparseFormat;
     bool justGammaMax;
     string chrom;
   };
@@ -56,6 +57,7 @@ int main(int argc, char* argv[]) {
   opts.add_options()
   ("parseRaoFormat,R", po::value<bool>(&p.raoFormat)->zero_tokens()->default_value(false), "Parse the Rao data format instead of Dixon et al. (Provide, for example, GM12878_combined/5kb_resolution_intrachromosomal/chr1/MAPQGE30/chr1_5kb,  and KR normalization is used.")
   ("noNormalization,N", po::value<bool>(&p.noNormalization)->zero_tokens()->default_value(false), "No normalization (Rao et al. format)")
+  ("parseSparseFormat,S", po::value<bool>(&p.sparseFormat)->zero_tokens()->default_value(false), "Parse sparse matrix format (input a 3 column text file)")
   ("gammaMax,g", po::value<double>(&p.gammaMax)->required(), "gamma-max (highest resolution to generate domains)")
   ("justGammaMax,j", po::value<bool>(&p.justGammaMax)->zero_tokens()->default_value(false), "Just obtain domains at the maximum Gamma")
   ("help,h", "produce help message")
@@ -88,6 +90,9 @@ int main(int argc, char* argv[]) {
       MatrixProperties matProp;
       if (p.raoFormat) {
           matProp = parseRaoMatrix(p.inputFile, p.resolution, p.chrom, p.noNormalization);
+      }
+      else if (p.sparseFormat) {
+	matProp = parseSparseMatrix(p.inputFile, p.resolution, p.chrom);
       }
       else { 
           matProp = parseGZipMatrix(p.inputFile, p.resolution, p.chrom);
