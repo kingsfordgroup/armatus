@@ -180,6 +180,61 @@ MatrixProperties parseRaoMatrix(string path, int resolution, string chrom, bool 
     return prop;
 }
 
+MatrixProperties parseSparseMatrix(string filepath, int resolution, string chrom) {
+  MatrixProperties prop;
+  int n;
+  int M=0;
+  
+  {
+    ifstream file(filepath);
+    if (!file.good()) {
+      std::cerr << "Couldn't read file: " << filepath << std::endl;
+      std::exit(1);
+    }
+    assert(file.good());
+
+    string line;
+    int v, w;
+    double count;
+    int maxv = 0;
+    while ( file >> v >> w >> count ) {
+      if (v > maxv) maxv = v;
+      if (w > maxv) maxv = w;
+      M += 1;
+    }
+    n = maxv/resolution+1;
+    prop.chrom = chrom;
+    prop.resolution = resolution;
+    cerr << "Building matrix for chromosome " << prop.chrom << " at resolution " << prop.resolution << "bp with " << n << " rows." << endl;
+  }
+
+  cout << "Initializing matrix to zero elements" << endl;
+  prop.matrix = std::make_shared<SparseMatrix>(n,n,M);
+  for (int i=0; i < n; i++) {
+    for (int j=0; j < n; j++) {
+      prop.matrix->insert_element(i,j,0.0);
+    }
+  }
+
+  {
+    ifstream file(filepath);
+
+    string line;
+    int v,w;
+    double count;
+    int m= 0;
+    while ( file >> v >> w >> count ) {
+      size_t i = v/resolution;
+      size_t j = w/resolution;
+      prop.matrix->insert_element(i,j, log(count));
+      m++;
+      if ( m % 100000 == 0 ) { std::cerr << "" << float(m)/M*100 << "%\n";}
+    }
+  }
+  return prop;
+}
+
+
 // domain size
 double d(size_t const & i, size_t const & j) {return j - i + 1;}
 

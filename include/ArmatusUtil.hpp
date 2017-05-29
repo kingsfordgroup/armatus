@@ -27,6 +27,7 @@ class MatrixProperties {
 
 MatrixProperties parseGZipMatrix(string path, int resolution, string chrom);
 MatrixProperties parseRaoMatrix(string path, int resolution, string chrom, bool noNormalization);
+MatrixProperties parseSparseMatrix(string path, int resolution, string chrom);
 
 double d(size_t const & i, size_t const & j);
 
