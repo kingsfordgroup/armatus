@@ -51,6 +51,8 @@ Then you gzip this text file. This gzipped file can then be provided to Armatus 
 
 Format 2: The format of Rao et al. domains (see first section above). You must use the `-R` option. 
 
+Format 3: Sparse matrix format from any dataset (3 column text file)
+
 Output Format
 -------------
 
@@ -80,6 +82,8 @@ You can get a list of Armatus' command line arguments by passing the `--help` pa
                                           romosomal/chr1/MAPQGE30/chr1_5kb,  and 
                                           KR normalization is used.
     -N [ --noNormalization ]              No normalization (Rao et al. format)
+    -S [ --parseSparseFormat ]            Parse sparse matrix format (input a 3
+                                          column text file)
     -g [ --gammaMax ] arg                 gamma-max (highest resolution to 
                                           generate domains)
     -j [ --justGammaMax ]                 Just obtain domains at the maximum 
@@ -111,7 +115,7 @@ We have noticed that occassionally, the *order* of the arguments passed can resu
 Example Run
 -----------
 
-The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.  *Note*: we recently noticed that the format of the matrices of Dixon et al. in the link above has changed.
+The main inputs into Armatus are the matrix file (in the format of Dixon et al.: http://chromosome.sdsc.edu/mouse/hi-c/download.html, Rao et al, or any sparse matrix formatted text file) and the gammaMax parameter which determines the highest resolution at which domains are to be generated.  *Note*: we recently noticed that the format of the matrices of Dixon et al. in the link above has changed.
 An example run on chromosome 1 of a human fibroblast:
 
     time armatus -i IMR90/40kb/combined/chr1.nij.comb.40kb.matrix.gz -g .5 -o test -m
