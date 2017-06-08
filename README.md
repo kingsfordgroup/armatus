@@ -51,7 +51,7 @@ Then you gzip this text file. This gzipped file can then be provided to Armatus 
 
 Format 2: The format of Rao et al. domains (see first section above). You must use the `-R` option. 
 
-Format 3: Sparse matrix format from any dataset (3 column text file)
+Format 3: Sparse matrix format from any dataset (3 column text file). You must use the `-S` option.
 
 Output Format
 -------------
