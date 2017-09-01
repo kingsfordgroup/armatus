@@ -3,7 +3,9 @@
 armatus
 =======
 
-<img src="logo/ArmatusLogo.png", width=300/>
+<!-- <img src="logo/ArmatusLogo.png", width=300/> -->
+
+![logo](logo/ArmatusLogo.png)
 
 Multiresolution domain calling software for chromosome conformation capture interaction matrices.
 
@@ -105,8 +107,6 @@ You can get a list of Armatus' command line arguments by passing the `--help` pa
 
 
 
-
-
 WARNING
 -------
 
@@ -185,6 +185,7 @@ Make sure you substitute `$HOME/boost` with the installation path you desire.
 Simpler build processes often work as well. For example, if you have boost
 installed in a standard place, and a standard compiler in a standard place,
 then it might be sufficient to do:
+
     mkdir build
     cd build
     cmake ..
